@@ -1,0 +1,13 @@
+## Interface: 50400
+## Version: @project-version@
+## Title: ShareXP
+## Notes: Shares XP with party.
+## Author: Sharparam
+## SavedVariables: ShareXPDB
+## SavedVariablesPerCharacter: ShareXPCharDB
+
+init.lua
+db.lua
+log.lua
+main.lua
+commands.lua
