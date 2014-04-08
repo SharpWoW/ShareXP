@@ -22,6 +22,8 @@
 
 local NAME, T = ...
 
+assert(type(T.EventManager) == "table", "LOAD ORDER ERROR: db.lua was loaded before events.lua")
+
 local DELIMITER = '.'
 local DELIMITER_NAME_MATCH = "[^\\" .. DELIMITER .. "]+$"
 

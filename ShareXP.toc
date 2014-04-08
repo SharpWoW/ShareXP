@@ -6,7 +6,11 @@
 ## SavedVariables: ShareXPDB
 ## SavedVariablesPerCharacter: ShareXPCharDB
 
+# utils.lua contains lua functions independent of the AddOn and WoW environment
+utils.lua
+
 init.lua
+events.lua
 db.lua
 log.lua
 main.lua

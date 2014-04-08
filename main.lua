@@ -22,40 +22,18 @@
 
 local NAME, T = ...
 
+assert(type(T.EventManager) == "table", "LOAD ORDER ERROR: main.lua was loaded before events.lua")
+
 local DB = T.DB
+local EM = T.EventManager
 
-local format = string.format
-local upper = string.upper
-
-T.Log = {
-    Levels = {
-        DEBUG = 0,
-        INFO = 1,
-        WARN = 2,
-        ERROR = 3,
-        FATAL = 4
-    },
-    Prefixes = {}
-}
-
-local Log = T.Log
-
-for k, v in pairs(Log.Levels) do
-    Log.Prefixes[v] = k --:lower():gsub("^%w", upper)
+function T:ADDON_LOADED(name)
+    if name == NAME then
+        DB:Load()
+        EM:Fire(NAME:upper() .. "_LOADED")
+    end
 end
 
-local function printf(...)
-    DEFAULT_CHAT_FRAME:AddMessage(format("%s: %s", NAME, format(...)))
-end
-
-local function lprintf(level, ...)
-    if not Log.Prefixes[level] then error("Invalid log level: " .. level) end
-    if level == Log.Levels.DEBUG and not DB:Get("logging.debug", false) then return end
-    local prefix = Log.Prefixes[level]
-    local msg = ("[%s] %s"):format(prefix, string.format(...))
-    printf(msg)
-end
-
-for id, level in pairs(Log.Levels) do
-    Log[id:lower():gsub("^%w", string.upper)] = function(s, ...) lprintf(level, ...) end
+function T:SHAREXP_LOADED()
+    T.Log:Info("ShareXP loaded!")
 end
