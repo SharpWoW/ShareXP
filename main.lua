@@ -24,16 +24,35 @@ local NAME, T = ...
 
 assert(type(T.EventManager) == "table", "LOAD ORDER ERROR: main.lua was loaded before events.lua")
 
-local DB = T.DB
+local Db = T.Database
 local EM = T.EventManager
+
+local Debug
 
 function T:ADDON_LOADED(name)
     if name == NAME then
-        DB:Load()
+        Db:Load()
+        Debug = Db:Get("debug", false)
         EM:Fire(NAME:upper() .. "_LOADED")
     end
 end
 
-function T:SHAREXP_LOADED()
-    T.Log:Info("ShareXP loaded!")
+function T:DebugCheck()
+    if not Debug then return end
+    if Debug.Value then _G[NAME] = T end
+end
+
+function T:SetDebug(enabled)
+    if not Debug then return end
+    Debug.Value = enabled
+    self:DebugCheck()
+end
+
+function T:ToggleDebug()
+    self:SetDebug(not Debug.Value)
+end
+
+function T:IsDebugEnabled()
+    if not Debug then return nil end
+    return Debug.Value
 end

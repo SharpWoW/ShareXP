@@ -27,7 +27,7 @@ T.String = {}
 local Str = T.String
 
 function Str:Split(str, delimiter)
-    if not s then return nil end
+    if not str then return nil end
     local t = {}
     if not delimiter then
         for token in str:gmatch("[^%s]+") do

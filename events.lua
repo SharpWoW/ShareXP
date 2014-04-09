@@ -39,7 +39,7 @@ local EM = T.EventManager
 function EM:Handle(frame, event, ...)
     if not self.Events[event] then return end
     for _, handler in pairs(self.Events[event]) do
-        handler(...)
+        handler(T, ...)
     end
 end
 
@@ -96,12 +96,9 @@ local mt = {
         end
     end,
     __newindex = function(tbl, key, value)
-        print("__newindex called: ", key, value)
         if key:match(EVENT_NAME_PATTERN) then
-            print("is event, calling EM:Add")
             EM:Add(key, value)
         else
-            print("not event, using rawset")
             rawset(tbl, key, value)
         end
     end

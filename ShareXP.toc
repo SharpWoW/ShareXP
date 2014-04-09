@@ -13,5 +13,7 @@ init.lua
 events.lua
 db.lua
 log.lua
+comm.lua
 main.lua
 commands.lua
+xp.lua

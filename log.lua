@@ -22,7 +22,7 @@
 
 local NAME, T = ...
 
-local DB = T.DB
+local Db = T.Database
 
 local format = string.format
 local upper = string.upper
@@ -50,7 +50,7 @@ end
 
 local function lprintf(level, ...)
     if not Log.Prefixes[level] then error("Invalid log level: " .. level) end
-    if level == Log.Levels.DEBUG and not DB:Get("logging.debug", false) then return end
+    if level == Log.Levels.DEBUG and (not Db.Loaded or not Db:Get("debug", false)) then return end
     local prefix = Log.Prefixes[level]
     local msg = ("[%s] %s"):format(prefix, string.format(...))
     printf(msg)

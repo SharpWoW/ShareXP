@@ -22,4 +22,6 @@
 
 local NAME, T = ...
 
+--_G["ShareXP"] = T
+
 T.Frame = CreateFrame("Frame")
