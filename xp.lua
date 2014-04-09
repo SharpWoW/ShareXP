@@ -63,6 +63,7 @@ function XP:Update(name, currentLevel, maxLevel, currentXp, maxXp)
     data.CurrentXP = currentXp
     data.MaxXP = maxXp
     T.EventManager:Fire("SHAREXP_XP_UPDATED")
+    Log:Debug("XP updated for %s", data.FriendlyName)
 end
 
 function XP:SendXP()
@@ -84,6 +85,7 @@ function XP:CheckGroup()
     end
     for k, _ in pairs(self.Data) do
         if not group[k] then
+            Log:Debug("Removing %s from group, no longer present", k)
             self.Data[k] = nil
         end
     end
