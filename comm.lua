@@ -59,7 +59,7 @@ end
 
 function Comm:Send(channel, target, kind, ...)
     if channel ~= "WHISPER" and channel ~= "CHANNEL" and target then
-        return self:Send(channel, nil, kind, ...)
+        return self:Send(channel, nil, target, kind, ...)
     end
     local message = kind
     local args = {...}
