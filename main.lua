@@ -27,32 +27,27 @@ assert(type(T.EventManager) == "table", "LOAD ORDER ERROR: main.lua was loaded b
 local Db = T.Database
 local EM = T.EventManager
 
-local Debug
-
 function T:ADDON_LOADED(name)
     if name == NAME then
         Db:Load()
-        Debug = Db:Get("debug", false)
+        Db:Get("debug", false)
         EM:Fire(NAME:upper() .. "_LOADED")
     end
 end
 
 function T:DebugCheck()
-    if not Debug then return end
-    if Debug.Value then _G[NAME] = T end
+    if Db:Get("debug", false) then _G[NAME] = T end
 end
 
 function T:SetDebug(enabled)
-    if not Debug then return end
-    Debug.Value = enabled
+    Db:Set("debug", enabled)
     self:DebugCheck()
 end
 
 function T:ToggleDebug()
-    self:SetDebug(not Debug.Value)
+    self:SetDebug(not Db:Get("debug", false))
 end
 
 function T:IsDebugEnabled()
-    if not Debug then return nil end
-    return Debug.Value
+    return Db:Get("debug", false)
 end
