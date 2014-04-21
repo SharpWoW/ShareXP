@@ -30,6 +30,8 @@ T.CommManager = {
 }
 
 local Comm = T.CommManager
+local Log = T.Log
+local Misc = T.Misc
 
 function Comm:Handle(message, channel, sender)
     if not message then return end
@@ -50,7 +52,7 @@ function Comm:Handle(message, channel, sender)
         end
     end
 
-    for _, handler in self.Handlers[kind] do
+    for _, handler in pairs(self.Handlers[kind]) do
         handler(channel, sender, arg, args)
     end
 end
@@ -86,6 +88,9 @@ end
 
 function T:CHAT_MSG_ADDON(prefix, message, channel, sender)
     if prefix ~= Comm.Prefix or channel ~= "PARTY" then return end
+    local fixedSender = Misc.FixName(sender)
+    local player = Misc.FixName(UnitName("player"))
+    if fixedSender == player then return end
     Comm:Handle(message, channel, sender)
 end
 

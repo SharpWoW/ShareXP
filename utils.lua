@@ -26,7 +26,7 @@ T.String = {}
 
 local Str = T.String
 
-function Str:Split(str, delimiter)
+function Str.Split(str, delimiter)
     if not str then return nil end
     local t = {}
     if not delimiter then
@@ -46,4 +46,16 @@ function Str:Split(str, delimiter)
         t[num + 1] = str:sub(lastPos)
     end
     return t
+end
+
+T.Misc = {}
+
+local Misc = T.Misc
+
+function Misc.FixName(name, realm)
+    local dashIndex = name:find('-')
+    if dashIndex and dashIndex ~= name:len() then return name end
+    if realm then return name .. '-' .. realm:gsub("%s", "") end
+    if dashIndex then name = name:sub(1, dashIndex - 1) end
+    return name .. '-' .. GetRealmName():gsub("%s", "")
 end

@@ -23,6 +23,7 @@
 local NAME, T = ...
 
 local Log = T.Log
+local Misc = T.Misc
 
 local Comm = T.CommManager
 
@@ -41,16 +42,8 @@ T.XPManager = {
 
 local XP = T.XPManager
 
-local function FixName(name, realm)
-    local dashIndex = name:find('-')
-    if dashIndex and dashIndex ~= name:len() then return name end
-    if realm then return name .. '-' .. realm:gsub("%s", "") end
-    if dashIndex then name = name:sub(1, dashIndex - 1) end
-    return name .. '-' .. GetRealmName():gsub("%s", "")
-end
-
 function XP:Update(name, currentLevel, maxLevel, currentXp, maxXp)
-    name = FixName(name)
+    name = Misc.FixName(name)
     if not self.Data[name] then
         self.Data[name] = {}
         local realm = name:match("-(.+)$")
@@ -75,12 +68,12 @@ function XP:SendXP()
 end
 
 function XP:CheckGroup()
-    local num = GetNumSubGroupMembers(LE_PARTY_CATEGORY_HOME)
+    local num = GetNumSubgroupMembers(LE_PARTY_CATEGORY_HOME)
     local group = {}
     for i = 1, num do
         local unit = "party" .. i
         local name, realm = UnitName(unit)
-        name = FixName(name, realm)
+        name = Misc.FixName(name, realm)
         group[name] = true
     end
     for k, _ in pairs(self.Data) do
