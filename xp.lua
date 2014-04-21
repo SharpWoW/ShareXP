@@ -42,8 +42,23 @@ T.XPManager = {
 
 local XP = T.XPManager
 
+local function IsAnyNil(...)
+    for i = 1, select('#', ...) do
+        if type((select(i, ...))) == nil then return true end
+    end
+    return false
+end
+
 function XP:Update(name, currentLevel, maxLevel, currentXp, maxXp)
     name = Misc.FixName(name)
+    currentLevel = tonumber(currentLevel)
+    maxLevel = tonumber(maxLevel)
+    currentXp = tonumber(currentXp)
+    maxXp = tonumber(maxXp)
+    if IsAnyNil(currentLevel, maxLevel, currentXp, maxXp) then
+        Log:Error("Invalid data received from %s", name)
+        return
+    end
     if not self.Data[name] then
         self.Data[name] = {}
         local realm = name:match("-(.+)$")
@@ -63,8 +78,12 @@ function XP:SendXP()
     local lvl = UnitLevel("player")
     local xp = UnitXP("player")
     local maxXp = UnitXPMax("player")
-    Comm:Send('PARTY', nil, 'xpupdate', lvl, self.MaxLevel, xp, maxXp)
+    Comm:Send('PARTY', 'xpupdate', lvl, self.MaxLevel, xp, maxXp)
     Log:Debug("Sent XP update to party")
+end
+
+function XP:RequestXP()
+    Comm:Send('PARTY', 'xprequest')
 end
 
 function XP:CheckGroup()
@@ -93,8 +112,14 @@ Comm:Add('xpupdate', function(channel, sender, arg, args)
     XP:Update(sender, args[1], args[2], args[3], args[4])
 end)
 
+Comm:Add('xprequest', function(channel, sender, arg, args)
+    Log:Debug("Received XP request from %s:%s", channel, sender)
+    XP:SendXP()
+end)
+
 function T:PLAYER_ENTERING_WORLD()
     XP:SendXP()
+    if IsInGroup() then XP:RequestXP() end
 end
 
 function T:PLAYER_XP_UPDATE()

@@ -31,17 +31,13 @@ function T:ADDON_LOADED(name)
     if name == NAME then
         Db:Load()
         Db:Get("debug", false)
+        _G[NAME] = T
         EM:Fire(NAME:upper() .. "_LOADED")
     end
 end
 
-function T:DebugCheck()
-    if Db:Get("debug", false) then _G[NAME] = T end
-end
-
 function T:SetDebug(enabled)
     Db:Set("debug", enabled)
-    self:DebugCheck()
 end
 
 function T:ToggleDebug()

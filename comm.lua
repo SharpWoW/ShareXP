@@ -57,11 +57,27 @@ function Comm:Handle(message, channel, sender)
     end
 end
 
+--[[
 function Comm:Send(channel, target, kind, ...)
     local message = kind
     local args = {...}
     for _, v in ipairs(args) do
         message = message .. ';' .. v
+    end
+    SendAddonMessage(self.Prefix, message, channel, target)
+end
+]]
+
+function Comm:Send(channel, ...)
+    local target
+    local args = {...}
+    if channel == "WHISPER" or channel == "CHANNEL" then
+        target = args[1]
+    end
+    local msgIndex = target and 2 or 1
+    local message
+    for i = msgIndex, #args do
+        message = (message and (message .. ';') or '') .. args[i]
     end
     SendAddonMessage(self.Prefix, message, channel, target)
 end
