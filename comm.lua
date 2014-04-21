@@ -57,8 +57,10 @@ function Comm:Handle(message, channel, sender)
     end
 end
 
---[[
 function Comm:Send(channel, target, kind, ...)
+    if channel ~= "WHISPER" and channel ~= "CHANNEL" and target then
+        return self:Send(channel, nil, kind, ...)
+    end
     local message = kind
     local args = {...}
     for _, v in ipairs(args) do
@@ -66,8 +68,8 @@ function Comm:Send(channel, target, kind, ...)
     end
     SendAddonMessage(self.Prefix, message, channel, target)
 end
-]]
 
+--[[
 function Comm:Send(channel, ...)
     local target
     local args = {...}
@@ -81,6 +83,7 @@ function Comm:Send(channel, ...)
     end
     SendAddonMessage(self.Prefix, message, channel, target)
 end
+]]
 
 function Comm:Add(kind, handler)
     kind = kind:lower()
@@ -112,4 +115,5 @@ end
 
 function T:SHAREXP_LOADED()
     RegisterAddonMessagePrefix(Comm.Prefix)
+    Log:Debug("Registered addon message prefix: %s", Comm.Prefix)
 end
