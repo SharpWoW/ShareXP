@@ -84,6 +84,7 @@ end
 
 function XP:RequestXP()
     Comm:Send('PARTY', 'xprequest')
+    Log:Debug("Sent XP request to party")
 end
 
 function XP:CheckGroup()
