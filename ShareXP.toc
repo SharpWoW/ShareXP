@@ -7,13 +7,13 @@
 ## SavedVariablesPerCharacter: ShareXPCharDB
 
 # utils.lua contains lua functions independent of the AddOn environment
-utils.lua
+lua\utils.lua
 
-init.lua
-events.lua
-db.lua
-log.lua
-comm.lua
-main.lua
-commands.lua
-xp.lua
+lua\init.lua
+lua\events.lua
+lua\db.lua
+lua\log.lua
+lua\comm.lua
+lua\main.lua
+lua\commands.lua
+lua\xp.lua

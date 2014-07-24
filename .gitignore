@@ -6,5 +6,7 @@
 # But allow the lint config
 !/lint_config.lua
 
-# Ignore build directory
+# Ignore build directories
 /build
+/lua
+/misc

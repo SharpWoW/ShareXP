@@ -34,21 +34,27 @@ except ValueError:
 
 TOC_FILENAME = "{0}.toc".format(name)
 
-print "{0}: Cleaning build directory".format(SCRIPT)
-if os.path.isdir('build'):
-    for f in os.listdir('build'):
-        fp = os.path.join('build', f)
-        try:
-            if os.path.isfile(fp):
-                os.unlink(fp)
-        except Exception, e:
-            print "{0}: EXCEPTION: Failed to delete {1}: {2}".format(SCRIPT, fp, e)
-elif os.path.isfile('build'):
-    os.unlink('build')
-    os.makedirs('build')
-else:
-    os.makedirs('build')
-print "{0}: Build directory cleanup completed!".format(SCRIPT)
+def clean_directory(dst):
+    print "{0}: Cleaning directory: {1}".format(SCRIPT, dst)
+    if os.path.isdir(dst):
+        for f in os.listdir(dst):
+            fp = os.path.join(dst, f)
+            try:
+                if os.path.isfile(fp):
+                    os.unlink(fp)
+            except Exception, e:
+                print "{0}: EXCEPTION: Failed to delete {1}: {2}".format(SCRIPT, fp, e)
+    elif os.path.isfile(dst):
+        os.unlink(dst)
+        os.makedirs(dst)
+    else:
+        os.makedirs(dst)
+    print "{0}: Directory cleanup completed: {1}".format(SCRIPT, dst)
+
+build_dirs = ['build', 'lua', 'misc']
+
+for build_dir in build_dirs:
+    clean_directory(build_dir)
 
 additional_files = ["LICENSE", "README.md", TOC_FILENAME]
 
@@ -63,22 +69,24 @@ def is_file_ignored(file):
     return False
 
 def compile_addon():
-    call(["moonc", "-t", "build", "*.moon"])
+    call(["moonc", "-t", "lua", "*.moon"])
     for filename in additional_files:
-        copy(filename, "build")
+        copy(filename, 'misc')
 
-def make_zip(src, dst):
+def make_zip(sources, dst):
     ignored.append(dst)
-    print "{0}: Zipping {1} into {2}".format(SCRIPT, src, dst)
+    print "{0}: Building zip file at {1}".format(SCRIPT, dst)
     zf = zipfile.ZipFile(dst, 'w')
-    abs_src = os.path.abspath(src)
-    for dirname, subdirs, files in os.walk(src):
-        for filename in files:
-            absname = os.path.abspath(os.path.join(dirname, filename))
-            if not is_file_ignored(absname):
-                arcname = os.path.join(name, absname[len(abs_src) + 1:])
-                print "{0} -> {1}".format(os.path.join(dirname, filename), arcname)
-                zf.write(absname, arcname)
+    for src in sources:
+        print "{0}: Adding {1} to zip".format(SCRIPT, src)
+        abs_src = os.path.abspath(src)
+        for dirname, subdirs, files in os.walk(src):
+            for filename in files:
+                absname = os.path.abspath(os.path.join(dirname, filename))
+                if not is_file_ignored(absname):
+                    arcname = os.path.join(name, 'lua' if src == 'lua' else '', absname[len(abs_src) + 1:])
+                    print "{0} -> {1}".format(os.path.join(dirname, filename), arcname)
+                    zf.write(absname, arcname)
     zf.close()
     print "{0}: DONE! Zip successfully created: {1}!".format(SCRIPT, dst)
 
@@ -97,4 +105,4 @@ zipname = "build/{0}_v{1}_b{2}.zip".format(name, version, build)
 
 compile_addon()
 
-make_zip('build', zipname)
+make_zip(['lua', 'misc'], zipname)
