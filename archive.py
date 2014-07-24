@@ -51,14 +51,14 @@ def clean_directory(dst):
         os.makedirs(dst)
     print "{0}: Directory cleanup completed: {1}".format(SCRIPT, dst)
 
-build_dirs = ['build', 'lua', 'misc']
+build_dirs = ['build', 'lua']
 
 for build_dir in build_dirs:
     clean_directory(build_dir)
 
 additional_files = ["LICENSE", "README.md", TOC_FILENAME]
 
-ignored = ['/.*', SCRIPT]
+ignored = ['/.*', SCRIPT, '*.moon', '*.zip']
 
 def is_file_ignored(file):
     for pattern in ignored:
@@ -73,22 +73,24 @@ def compile_addon():
     for filename in additional_files:
         copy(filename, 'misc')
 
-def make_zip(sources, dst):
-    ignored.append(dst)
-    print "{0}: Building zip file at {1}".format(SCRIPT, dst)
-    zf = zipfile.ZipFile(dst, 'w')
+def zip_file(zf, file, src, abs_src, absname):
+    if not is_file_ignored(absname):
+        arcfilename = absname[len(abs_src) + 1:]
+        arcname = os.path.join(name, 'lua' if src == 'lua' else '', src if arcfilename == '' else arcfilename)
+        print "{0} -> {1}".format(file, arcname)
+        zf.write(absname, arcname)
+
+def make_zip(sources, dst, zf):
     for src in sources:
         print "{0}: Adding {1} to zip".format(SCRIPT, src)
         abs_src = os.path.abspath(src)
-        for dirname, subdirs, files in os.walk(src):
-            for filename in files:
-                absname = os.path.abspath(os.path.join(dirname, filename))
-                if not is_file_ignored(absname):
-                    arcname = os.path.join(name, 'lua' if src == 'lua' else '', absname[len(abs_src) + 1:])
-                    print "{0} -> {1}".format(os.path.join(dirname, filename), arcname)
-                    zf.write(absname, arcname)
-    zf.close()
-    print "{0}: DONE! Zip successfully created: {1}!".format(SCRIPT, dst)
+        if os.path.isdir(src):
+            for dirname, subdirs, files in os.walk(src):
+                for filename in files:
+                    absname = os.path.abspath(os.path.join(dirname, filename))
+                    zip_file(zf, filename, src, abs_src, absname)
+        elif os.path.isfile(src):
+            zip_file(zf, src, src, abs_src, abs_src)
 
 def get_version():
     version = "UNKNOWN"
@@ -105,4 +107,11 @@ zipname = "build/{0}_v{1}_b{2}.zip".format(name, version, build)
 
 compile_addon()
 
-make_zip(['lua', 'misc'], zipname)
+ignored.append(zipname)
+
+print "{0}: Building zip file at {1}".format(SCRIPT, zipname)
+
+with zipfile.ZipFile(zipname, 'w', zipfile.ZIP_DEFLATED) as zf:
+    make_zip(['lua', 'LICENSE', 'README.md', 'ShareXP.toc'], zipname, zf)
+    zf.close()
+    print "{0}: DONE! Zip successfully created: {1}!".format(SCRIPT, zipname)
