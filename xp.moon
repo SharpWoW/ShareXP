@@ -26,6 +26,13 @@ comm = T.comm_manager
 
 local is_any_nil
 
+{
+    :GetExpansionLevel, :GetRealmName, :GetNumSubgroupMembers
+    :IsInGroup
+    :LE_PARTY_CATEGORY_HOME
+    :UnitLevel, :UnitName, :UnitXP, :UnitXPMax
+} = _G
+
 T.xp_manager =
     max_levels:
         [0]: 60  -- Classic/Vanilla
@@ -53,7 +60,7 @@ T.xp_manager =
             local_realm = GetRealmName!\gsub '%s', ''
             @data[name].friendly_name = (realm == local_realm) and name\match '(.+)-' or name
 
-        with @data[name]
+        data = with @data[name]
             .current_level = current_level
             .max_level = max_level
             .current_xp = current_xp

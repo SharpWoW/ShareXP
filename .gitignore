@@ -3,3 +3,5 @@
 
 # Ignore Lua files (compiled by MoonScript)
 *.lua
+# But allow the lint config
+!/lint_config.lua

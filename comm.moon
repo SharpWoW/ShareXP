@@ -24,6 +24,13 @@ DELIMITER = ';'
 
 local comm, log, misc
 
+{
+    :SendAddonMessage
+    :wipe
+    :UnitName
+    :RegisterAddonMessagePrefix
+} = _G
+
 T.comm_manager =
     prefix: NAME\upper!
     handlers: {}

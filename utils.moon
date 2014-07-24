@@ -20,6 +20,8 @@
 
 NAME, T = ...
 
+{ :GetRealmName } = _G
+
 T.string =
     split: (str, delim) ->
         return nil unless str
