@@ -83,7 +83,7 @@ T.CHAT_MSG_ADDON = (prefix, message, channel, sender) =>
     fixed_sender = misc.fix_name sender
     player = misc.fix_name UnitName 'player'
     return if fixed_sender == player
-    comm\handle mesage, channel, sender
+    comm\handle message, channel, sender
 
 T.SHAREXP_LOADED = =>
     RegisterAddonMessagePrefix comm.prefix
