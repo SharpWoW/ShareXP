@@ -1,5 +1,5 @@
 ## Interface: 50400
-## Version: @project-version@
+## Version: 1.0.0
 ## Title: ShareXP
 ## Notes: Shares XP with party.
 ## Author: Sharparam
