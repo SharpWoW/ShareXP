@@ -1,2 +1,5 @@
 # Ignore Sublime Text workspace file
 *.sublime-workspace
+
+# Ignore Lua files (compiled by MoonScript)
+*.lua
