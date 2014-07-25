@@ -22,29 +22,29 @@ NAME, T = ...
 
 db = T.database
 
-import format, upper from string
+import format from string
 
-T.log =
-    levels:
+class T.Logger
+    @levels:
         DEBUG: 0
         INFO: 1
         WARN: 2
         ERROR: 3
         FATAL: 4
 
-import log from T
+    new: (@name) =>
 
-log.prefixes = {v, k for k, v in pairs log.levels}
+    log: (level, ...) =>
+        return if level == @@levels.DEBUG and (not db.loaded or not db\get 'debug', false)
+        prefix = @@prefixes[level] or 'UNKNOWN'
+        msg = '%s.%s: [%s] %s'\format NAME, @name, prefix, format ...
+        DEFAULT_CHAT_FRAME\AddMessage msg
 
-printf = (...) ->
-    DEFAULT_CHAT_FRAME\AddMessage format '%s: %s', NAME, format ...
+import Logger from T
 
-lprintf = (level, ...) ->
-    error "Invalid log level: #{level}" unless log.prefixes[level]
-    return if level == log.levels.DEBUG and (not db.loaded or not db\get 'debug', false)
-    prefix = log.prefixes[level]
-    msg = '[%s] %s'\format prefix, format ...
-    printf msg
+Logger.prefixes = {v, k for k, v in pairs Logger.levels}
 
-for id, level in pairs log.levels
-    log[id\lower!] = (...) -> lprintf level, ...
+for id, level in pairs Logger.levels
+    Logger.__base[id\lower!] = (...) => @log level, ...
+
+T.log = Logger('main')
