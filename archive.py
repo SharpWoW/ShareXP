@@ -4,22 +4,22 @@
 # Copyright © 2014 by Adam Hellberg <adam.hellberg@sharparam.com>.
 #
 
-import io
 import os
 import re
 import sys
-import json
 import fnmatch
 import zipfile
-from shutil import copy
 from subprocess import call
 
 SCRIPT = sys.argv[0]
 
 TOC_VERSION_PATTERN = re.compile("^## Version: (\d+\.\d+\.\d+(?:-[a-z0-9]+)?)$")
 
+def log(msg, *args):
+    print '{0}: {1}'.format(SCRIPT, msg.format(*args))
+
 if len(sys.argv) < 3:
-    print '{0}: expected args: name, build number'.format(SCRIPT)
+    log('expected args: name, build number')
     sys.exit(1)
 
 name = None
@@ -29,13 +29,13 @@ try:
     name = str(sys.argv[1]).strip()
     build = int(sys.argv[2].strip())
 except ValueError:
-    print "{0}: expected build number argument of type integer".format(SCRIPT)
+    log('expected build number argument of type integer')
     sys.exit(1)
 
 TOC_FILENAME = "{0}.toc".format(name)
 
 def clean_directory(dst):
-    print "{0}: Cleaning directory: {1}".format(SCRIPT, dst)
+    log('Cleaning directory: {0}', dst)
     if os.path.isdir(dst):
         for f in os.listdir(dst):
             fp = os.path.join(dst, f)
@@ -43,13 +43,13 @@ def clean_directory(dst):
                 if os.path.isfile(fp):
                     os.unlink(fp)
             except Exception, e:
-                print "{0}: EXCEPTION: Failed to delete {1}: {2}".format(SCRIPT, fp, e)
+                log('EXCEPTION: Failed to delete {0}: {1}', fp, e)
     elif os.path.isfile(dst):
         os.unlink(dst)
         os.makedirs(dst)
     else:
         os.makedirs(dst)
-    print "{0}: Directory cleanup completed: {1}".format(SCRIPT, dst)
+    log('{0}: Directory cleanup completed: {0}', dst)
 
 build_dirs = ['build', 'lua']
 
@@ -70,27 +70,25 @@ def is_file_ignored(file):
 
 def compile_addon():
     call(["moonc", "-t", "lua", "*.moon"])
-    for filename in additional_files:
-        copy(filename, 'misc')
 
-def zip_file(zf, file, src, abs_src, absname):
+def zip_file(zf, file):
+    absname = os.path.abspath(file)
     if not is_file_ignored(absname):
-        arcfilename = absname[len(abs_src) + 1:]
-        arcname = os.path.join(name, 'lua' if src == 'lua' else '', src if arcfilename == '' else arcfilename)
-        print "{0} -> {1}".format(file, arcname)
+        arcname = os.path.join(name, file)
+        log('{0} -> {1}', file, arcname)
         zf.write(absname, arcname)
 
-def make_zip(sources, dst, zf):
+def zip_dir(zf, path):
+    for dirpath, dirnames, filenames in os.walk(path):
+        for filename in filenames:
+            zip_file(zf, os.path.join(dirpath, filename))
+
+def make_zip(sources, zf):
     for src in sources:
-        print "{0}: Adding {1} to zip".format(SCRIPT, src)
-        abs_src = os.path.abspath(src)
         if os.path.isdir(src):
-            for dirname, subdirs, files in os.walk(src):
-                for filename in files:
-                    absname = os.path.abspath(os.path.join(dirname, filename))
-                    zip_file(zf, filename, src, abs_src, absname)
-        elif os.path.isfile(src):
-            zip_file(zf, src, src, abs_src, abs_src)
+            zip_dir(zf, src)
+        else:
+            zip_file(zf, src)
 
 def get_version():
     version = "UNKNOWN"
@@ -109,9 +107,9 @@ compile_addon()
 
 ignored.append(zipname)
 
-print "{0}: Building zip file at {1}".format(SCRIPT, zipname)
+log('Building zip file at {0}', zipname)
 
 with zipfile.ZipFile(zipname, 'w', zipfile.ZIP_DEFLATED) as zf:
-    make_zip(['lua', 'LICENSE', 'README.md', 'ShareXP.toc'], zipname, zf)
+    make_zip(['lua', 'LICENSE', 'README.md', 'ShareXP.toc'], zf)
     zf.close()
-    print "{0}: DONE! Zip successfully created: {1}!".format(SCRIPT, zipname)
+    log('DONE! Zip successfully created: {0}!', zipname)
