@@ -1,16 +1,16 @@
 {
+	"build_systems":
+	[
+		{
+			"name": "Run archive.py",
+			"shell_cmd": "python archive.py ShareXP 0"
+		}
+	],
 	"folders":
 	[
 		{
 			"follow_symlinks": true,
 			"path": "."
 		}
-	],
-    "build_systems":
-    [
-        {
-            "name": "Run archive.py",
-            "shell_cmd": "python archive.py ShareXP 0"
-        }
-    ]
+	]
 }

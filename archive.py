@@ -49,7 +49,7 @@ def clean_directory(dst):
         os.makedirs(dst)
     else:
         os.makedirs(dst)
-    log('{0}: Directory cleanup completed: {0}', dst)
+    log('Directory cleanup completed: {0}', dst)
 
 build_dirs = ['build', 'lua']
 
@@ -101,7 +101,7 @@ def get_version():
 
 version = get_version()
 
-zipname = "build/{0}_v{1}_b{2}.zip".format(name, version, build)
+zipname = os.path.join('build', '{0}_v{1}_b{2}.zip'.format(name, version, build))
 
 compile_addon()
 
