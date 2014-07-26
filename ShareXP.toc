@@ -6,6 +6,10 @@
 ## SavedVariables: ShareXPDB
 ## SavedVariablesPerCharacter: ShareXPCharDB
 
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\LibDataBroker-1-1\LibDataBroker-1.1.lua
+
 # utils.lua contains lua functions independent of the AddOn environment
 lua\utils.lua
 
@@ -17,3 +21,4 @@ lua\comm.lua
 lua\main.lua
 lua\commands.lua
 lua\xp.lua
+lua\broker.lua

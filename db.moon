@@ -27,45 +27,46 @@ DELIMITER_TOKEN_MATCH = '[^' .. DELIMITER_ESCAPED .. ']+'
 
 local check_global, parse_key, extract_name, prepare
 
-T.database =
-    loaded: false
-    global_name: NAME .. 'DB'
+class Database
+    new: (@global_name) =>
+        @loaded = false
 
     load: =>
         _G[@global_name] = {} if type(_G[@global_name]) != 'table'
         @global = _G[@global_name]
         @loaded = true
-        T.event_manager\fire 'SHAREXP_DB_LOADED'
+        T.event_manager\fire 'SHAREXP_DB_LOADED', @
 
     -- Probably not needed
     save: =>
         _G[@global_name] = @global
 
     get: (key, default) =>
-        t = parse_key key
+        t = parse_key @, key
         name = extract_name key
-        prepare name, default, t
+        prepare @, name, default, t
         t[name]._VALUE
 
     set: (key, value) =>
-        t = parse_key key
+        t = parse_key @, key
         name = extract_name key
-        prepare name, value, t
+        prepare @, name, value, t
         t[name]._VALUE = value
 
     reset: (key) =>
-        t = parse_key key
+        t = parse_key @, key
         name = extract_name key
         return if type(t[name]) != 'table'
         t[name]._VALUE = t[name]._DEFAULT
 
-db = T.database
+T.database = Database NAME .. 'DB'
+T.database_char = Database NAME .. 'CharDB'
 
-check_global = ->
+check_global = (db) ->
     if type(db.global) != 'table'
         error 'Tried to perform a database operation before database loaded'
 
-parse_key = (key) ->
+parse_key = (db, key) ->
     key = key\lower!
     keys = [token for token in key\gmatch DELIMITER_TOKEN_MATCH]
     check_global!
@@ -78,7 +79,7 @@ parse_key = (key) ->
 extract_name = (key) ->
     key\match DELIMITER_NAME_MATCH
 
-prepare = (key, default, tbl) ->
+prepare = (db, key, default, tbl) ->
     check_global!
     tbl = tbl or db.global
     if type(tbl[key]) != 'table'
@@ -91,4 +92,5 @@ mt =
     __call: (tbl, key, default) ->
         tbl\get key, default
 
-setmetatable db, mt
+setmetatable T.database, mt
+setmetatable T.database_char, mt

@@ -68,7 +68,11 @@ def is_file_ignored(file):
             return True
     return False
 
+def lint_addon():
+    call(["moonc", "-l", "*.moon"])
+
 def compile_addon():
+    lint_addon()
     call(["moonc", "-t", "lua", "*.moon"])
 
 def zip_file(zf, file):
@@ -110,6 +114,6 @@ ignored.append(zipname)
 log('Building zip file at {0}', zipname)
 
 with zipfile.ZipFile(zipname, 'w', zipfile.ZIP_DEFLATED) as zf:
-    make_zip(['lua', 'LICENSE', 'README.md', 'ShareXP.toc'], zf)
+    make_zip(['libs', 'lua', 'LICENSE', 'README.md', 'ShareXP.toc'], zf)
     zf.close()
     log('DONE! Zip successfully created: {0}!', zipname)
