@@ -67,7 +67,7 @@ register = cm\register
 
 register 'd', (arg) ->
     if arg then T\set_debug arg\match '^[ye]' and true or false else T\toggle_debug!
-    log\notice "Debugging #{T\is_debug_enabled! and 'ENABLED' or 'DISABLED'}!"
+    log\notice 'Debugging %s!', T\is_debug_enabled! and 'ENABLED' or 'DISABLED'
 
 register 'l', (arg, section, s_arg, ss_arg) ->
     if not arg
