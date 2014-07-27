@@ -23,6 +23,8 @@ NAME, T = ...
 DELIMITER = '\t'
 DELIMITER_MATCH = '[^' .. DELIMITER .. ']+'
 
+MAX_MESSAGE_LENGTH = 250
+
 local comm, log, misc
 
 {
@@ -62,6 +64,9 @@ T.comm_manager =
         message = kind
         for v in *{...}
             message ..= DELIMITER .. v
+
+        if message\len! > MAX_MESSAGE_LENGTH
+            log\warn 'comm_manager\send: (%s) message length > %d', kind, MAX_MESSAGE_LENGTH
 
         SendAddonMessage @prefix, message, channel, target
 
