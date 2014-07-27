@@ -20,10 +20,10 @@
 
 NAME, T = ...
 
-{ :GetRealmName } = _G
+{ :GetRealmName, :LARGE_NUMBER_SEPERATOR } = _G
 
 T.string =
-    split: (str, delim) ->
+    split: (str, delim using nil) ->
         return nil unless str
         t = {}
         if delim then
@@ -40,20 +40,17 @@ T.string =
         t
 
 T.number =
-    format: (number) ->
+    -- Format function courtesy of SDPhantom from WoWInterface
+    -- http://www.wowinterface.com/forums/showpost.php?p=270917&postcount=11
+    format: (number using nil) ->
         number = tostring number
-        return number if number\match '[^%d%.]' -- Only format normal numbers
-        left, right = number\match '^(%d+)(.*)' -- We do not want decimals
-        len = left\len!
-        return number if len < 4
-        mod = len % 3
-        left = left\sub(1, mod)\gsub('%d$', '%1,') .. left\sub(mod + 1)\gsub '%d%d%d', '%1,'
-        (left\sub 1, left\len! - 1) .. right
+        number\gsub '^(%d)(%d+)', (pre, post) ->
+            pre .. post\reverse!\gsub('(%d%d%d)', '%1' .. LARGE_NUMBER_SEPERATOR)\reverse!
 
 local equal
 
 T.table =
-    equal: (first, second) ->
+    equal: (first, second using nil) ->
         first_type = type first
         second_type = type second
         return false if first_type != 'table' or second_type != 'table'
@@ -69,12 +66,12 @@ T.table =
 import equal from T.table
 
 T.misc =
-    fix_name: (name, realm) ->
+    fix_name: (name, realm using nil) ->
         dashindex = name\find '-'
         return name if dashindex and dashindex != name\len!
         return name .. '-' .. realm\gsub '%s', '' if realm
         name = name\sub 1, dashindex - 1 if dashindex
         name .. '-' .. GetRealmName!\gsub '%s', ''
 
-    decorate: (text, color) ->
+    decorate: (text, color using nil) ->
         '\127cff%s%s\127r'\format color, text
