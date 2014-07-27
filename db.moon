@@ -35,7 +35,7 @@ DELIMITER_ESCAPED = '\\' .. DELIMITER
 DELIMITER_NAME_MATCH = '[^' .. DELIMITER_ESCAPED .. ']+$'
 DELIMITER_TOKEN_MATCH = '[^' .. DELIMITER_ESCAPED .. ']+'
 
-local check_global, parse_key, extract_name, extract_keys, prepare
+local parse_key, extract_name, extract_keys, prepare
 
 class Database
     GET = 0
@@ -135,13 +135,12 @@ class Database
             @log\warn 'reset called before load, queueing reset action on %s', key
             @enqueue RESET, key
 
-database = Database NAME .. 'DB'
-database_char = Database NAME .. 'CharDB'
+T.database = Database NAME .. 'DB'
+T.database_char = Database NAME .. 'CharDB'
 
 parse_key = (db, key) ->
     key = key\lower!
     keys = extract_keys key
-    check_global!
     t = db.global
     for i = 1, #keys - 1
         t[keys[i]] = {} if type(t[keys[i]]) != 'table'
@@ -165,6 +164,3 @@ prepare = (tbl, key, default) ->
                 ._DEFAULT = default unless default_type == 'nil' or equal ._DEFAULT, default
             else
                 ._DEFAULT = default if ._DEFAULT != default and default_type != 'nil'
-
-T.database = database
-T.database_char = database_char
