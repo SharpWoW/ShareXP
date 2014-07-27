@@ -69,11 +69,21 @@ def is_file_ignored(file):
     return False
 
 def lint_addon():
-    call(["moonc", "-l", "*.moon"])
+    ret = call(["moonc", "-l", "*.moon"])
+    if ret != 0:
+        log('FAILURE: moonc linter exited with non-zero return code')
+        sys.exit(1)
 
 def compile_addon():
     lint_addon()
-    call(["moonc", "-t", "lua", "*.moon"])
+    ret = call(["moonc", "-t", "lua", "*.moon"])
+    if ret != 0:
+        log('FAILURE: moonc compile exited with non-zero return code')
+        sys.exit(1)
+    ret = call(["luac", "-p", "lua/*.lua"])
+    if ret != 0:
+        log('FAILURE: luac parse exited with non-zero return code')
+        sys.exit(1)
 
 def zip_file(zf, file):
     absname = os.path.abspath(file)
