@@ -39,6 +39,24 @@ T.string =
                 t[#t + 1] = token
         return t
 
+local equal
+
+T.table =
+    equal: (first, second) ->
+        first_type = type first
+        second_type = type second
+        return false if first_type != 'table' or second_type != 'table'
+        for k, v in pairs first
+            if type(k) == 'table'
+                error 'Comparison with tables as keys not yet implemented'
+            if type(v) == 'table'
+                return false unless equal v, second[k]
+            else
+                return false if v != second[k]
+        true
+
+import equal from T.table
+
 T.misc =
     fix_name: (name, realm) ->
         dashindex = name\find '-'

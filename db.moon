@@ -20,6 +20,14 @@
 
 NAME, T = ...
 
+-- We import `type` because of possible performance issues
+-- if db methods are called from places such as OnUpdate
+-- callbacks
+import type from _G
+
+-- Same deal with importinhg equal from our table utils
+import equal from T.table
+
 DELIMITER = '.'
 DELIMITER_ESCAPED = '\\' .. DELIMITER
 DELIMITER_NAME_MATCH = '[^' .. DELIMITER_ESCAPED .. ']+$'
@@ -28,13 +36,33 @@ DELIMITER_TOKEN_MATCH = '[^' .. DELIMITER_ESCAPED .. ']+'
 local check_global, parse_key, extract_name, prepare
 
 class Database
+    GET = 0
+    SET = 1
+
     new: (@global_name) =>
+        @log = T.Logger 'db.' .. @global_name
         @loaded = false
+        @queue = {}
+
+    enqueue: (method, key, value) =>
+        if @loaded
+            error 'Database.enqueue called when db loaded'
+        if method != GET and method != SET
+            error 'Database.enqueue called with invalid method arg: ' .. method
+        @queue[#@queue + 1] = {:method, :key, :value}
 
     load: =>
         _G[@global_name] = {} if type(_G[@global_name]) != 'table'
         @global = _G[@global_name]
         @loaded = true
+        for item in *@queue
+            with item
+                switch .method
+                    when GET
+                        @ .key, .value
+                    when SET
+                        @set .key, .value
+        @queue = nil
         T.event_manager\fire 'SHAREXP_DB_LOADED', @
 
     -- Probably not needed
@@ -42,16 +70,28 @@ class Database
         _G[@global_name] = @global
 
     get: (key, default) =>
-        t = parse_key @, key
-        name = extract_name key
-        prepare @, name, default, t
-        t[name]._VALUE
+        if @loaded
+            t = parse_key @, key
+            name = extract_name key
+            prepare @, name, default, t
+            t[name]._VALUE
+        else
+            @log\warn 'get called before load, returning approximate value for %s', key
+            @enqueue GET, key, default
+            local entry
+            for item in *@queue
+                entry = item if item.key == key
+            entry.value if entry else default
 
     set: (key, value) =>
-        t = parse_key @, key
-        name = extract_name key
-        prepare @, name, value, t
-        t[name]._VALUE = value
+        if @loaded
+            t = parse_key @, key
+            name = extract_name key
+            prepare @, name, value, t
+            t[name]._VALUE = value
+        else
+            @log\warn 'set called before load, queueing set action on %s', key
+            @enqueue SET, key, value
 
     reset: (key) =>
         t = parse_key @, key
@@ -87,7 +127,10 @@ prepare = (db, key, default, tbl) ->
     else
         with tbl[key]
             ._VALUE = default if type(._VALUE) != type default
-            ._DEFAULT = default if ._DEFAULT != default
+            if type(._DEFAULT) == 'table'
+                ._DEFAULT = default unless equal ._DEFAULT, default
+            else
+                ._DEFAULT = default if ._DEFAULT != default
 
 mt =
     __call: (tbl, key, default) ->
