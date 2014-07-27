@@ -100,15 +100,16 @@ is_any_nil = (...) ->
 
 xp = T.xp_manager
 
-comm\add 'xpupdate', (channel, sender, arg, args) ->
-    -- args[1]: current level
-    -- args[2]: max level
-    -- args[3]: current xp
-    -- args[4]: max xp
+comm\add 'xpupdate', (channel, sender, ...) ->
+    -- ARGS:
+    -- 1: current level
+    -- 2: max level
+    -- 3: current xp
+    -- 4: max xp
     log\debug 'Received XP update from %s:%s', channel, sender
-    xp\update sender, unpack args
+    xp\update sender, ...
 
-comm\add 'xprequest', (channel, sender, arg, args) ->
+comm\add 'xprequest', (channel, sender) ->
     log\debug 'Received XP request from %s:%s', channel, sender
     xp\send_xp!
 

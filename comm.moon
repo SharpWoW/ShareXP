@@ -20,7 +20,8 @@
 
 NAME, T = ...
 
-DELIMITER = ';'
+DELIMITER = '\t'
+DELIMITER_MATCH = '[^' .. DELIMITER .. ']+'
 
 local comm, log, misc
 
@@ -45,24 +46,22 @@ T.comm_manager =
 
         return unless @handlers[kind]
 
-        local arg, args
+        args = {}
         if di
             arg = message\sub di + 1
-            args = {}
-            for token in arg\gmatch '[^' .. DELIMITER .. ']+'
+            for token in arg\gmatch DELIMITER_MATCH
                 args[#args + 1] = token
 
         for _, handler in pairs @handlers[kind]
-            handler channel, sender, arg, args
+            handler channel, sender, unpack args
 
     send: (channel, target, kind, ...) =>
         if channel != 'WHISPER' and channel != 'CHANNEL' and target
             return @send channel, nil, target, kind, ...
 
         message = kind
-        args = {...}
-        for v in *args
-            message ..= ';' .. v
+        for v in *{...}
+            message ..= DELIMITER .. v
 
         SendAddonMessage @prefix, message, channel, target
 
