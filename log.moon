@@ -38,6 +38,10 @@ class T.Logger
     @level_to_prefix: (level) =>
         @prefixes[level] or 'UNKNOWN'
 
+    @prefix_to_level: (prefix) =>
+        prefix = prefix\upper!
+        @levels[prefix] or -1
+
     new: (@name, @color) =>
 
     log: (level, ...) =>
@@ -100,6 +104,7 @@ T.SHAREXP_DB_UPDATED = (db, key) =>
             prefix = key\match '^log\.color\.level\.(%w+)$'
             if prefix
                 prefix = prefix\upper!
-                color = Logger.colors.levels[prefix]!
+                level = Logger\prefix_to_level prefix
+                color = Logger.colors.levels[level]!
                 msg = '%s color changed to %s.'\format prefix, color
                 log\notice decorate(msg, color)
