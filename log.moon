@@ -22,6 +22,8 @@ NAME, T = ...
 
 db = T.database
 
+import decorate from T.misc
+
 import format from string
 
 class T.Logger
@@ -31,20 +33,66 @@ class T.Logger
         WARN: 2
         ERROR: 3
         FATAL: 4
+        NOTICE: 5
 
-    new: (@name) =>
+    @level_to_prefix: (level) =>
+        @prefixes[level] or 'UNKNOWN'
+
+    new: (@name, @color) =>
 
     log: (level, ...) =>
-        return if level == @@levels.DEBUG and (not db.loaded or not db\get 'debug', false)
-        prefix = @@prefixes[level] or 'UNKNOWN'
-        msg = '%s.%s: [%s] %s'\format NAME, @name, prefix, format ...
+        return unless db 'log', true
+        return if level == @@levels.DEBUG and (not db.loaded or not db 'debug', false)
+        return if level < db 'log.level', @@levels.INFO
+        prefix = @@level_to_prefix level
+        docolor = db 'log.color', true
+        prefix_color = (docolor and @@colors.levels[level]) and @@colors.levels[level]! or nil
+        msg = '%s.%s: [%s] %s'\format docolor and decorate(NAME, @@colors.name!) or NAME,
+            (docolor and @color) and decorate(@name, @color) or @name,
+            (docolor and prefix_color) and decorate(prefix, prefix_color) or prefix,
+            format ...
         DEFAULT_CHAT_FRAME\AddMessage msg
 
 import Logger from T
 
 Logger.prefixes = {v, k for k, v in pairs Logger.levels}
 
+with Logger
+    .colors =
+        name: -> db 'log.color.name', '00FF00'
+        levels:
+            [.levels.DEBUG]:  -> db 'log.color.level.debug',  '008000' -- Green
+            [.levels.INFO]:   -> db 'log.color.level.info',   'FFFFFF' -- White
+            [.levels.WARN]:   -> db 'log.color.level.warn',   'FFD700' -- Gold
+            [.levels.ERROR]:  -> db 'log.color.level.error',  'FF0000' -- Red
+            [.levels.FATAL]:  -> db 'log.color.level.fatal',  'FF0000' -- Red
+            [.levels.NOTICE]: -> db 'log.color.level.notice', '00FFFF' -- Cyan
+
 for id, level in pairs Logger.levels
     Logger.__base[id\lower!] = (...) => @log level, ...
 
-T.log = Logger('main')
+log = Logger('main')
+
+T.log = log
+
+T.SHAREXP_DB_UPDATED = (db, key) =>
+    return unless db.global_name == 'ShareXPDB'
+    return unless key\match '^log'
+    switch key
+        when 'log'
+            log\notice 'Logging %s.', db('log') and 'enabled' or 'disabled'
+        when 'log.color'
+            log\notice 'Log coloring %s.', db('log.color') and 'enabled' or 'disabled'
+        when 'log.level'
+            log\notice 'Logging level changed to %s.', Logger\level_to_prefix db 'log.level'
+        when 'log.color.name'
+            color = Logger.colors.name!
+            msg = 'Name color changed to %s.'\format color
+            log\notice decorate(msg, color)
+        else
+            prefix = key\match '^log\.color\.level\.(%w+)$'
+            if prefix
+                prefix = prefix\upper!
+                color = Logger.colors.levels[prefix]!
+                msg = '%s color changed to %s.'\format prefix, color
+                log\notice decorate(msg, color)

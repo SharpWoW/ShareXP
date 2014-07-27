@@ -37,7 +37,7 @@ T.string =
         else
             for token in str\gmatch '[^%s]+'
                 t[#t + 1] = token
-        return t
+        t
 
 local equal
 
@@ -64,3 +64,6 @@ T.misc =
         return name .. '-' .. realm\gsub '%s', '' if realm
         name = name\sub 1, dashindex - 1 if dashindex
         name .. '-' .. GetRealmName!\gsub '%s', ''
+
+    decorate: (text, color) ->
+        '\127cff%s%s\127r'\format color, text

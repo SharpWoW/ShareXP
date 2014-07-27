@@ -28,16 +28,28 @@ import type from _G
 -- Same deal with importinhg equal from our table utils
 import equal from T.table
 
+{event_manager: em} = T
+
 DELIMITER = '.'
 DELIMITER_ESCAPED = '\\' .. DELIMITER
 DELIMITER_NAME_MATCH = '[^' .. DELIMITER_ESCAPED .. ']+$'
 DELIMITER_TOKEN_MATCH = '[^' .. DELIMITER_ESCAPED .. ']+'
 
-local check_global, parse_key, extract_name, prepare
+local check_global, parse_key, extract_name, extract_keys, prepare
 
 class Database
     GET = 0
     SET = 1
+
+    -- This will make sure updates are fired for the key
+    -- and any parent keys, for example:
+    -- send_update(db, 'one.two.three') will fire updates
+    -- for:
+    -- one
+    -- one.two
+    -- one.two.three
+    send_update = (db, key) ->
+        em\fire 'SHAREXP_DB_UPDATED', db, key
 
     new: (@global_name) =>
         @log = T.Logger 'db.' .. @global_name
@@ -59,11 +71,11 @@ class Database
             with item
                 switch .method
                     when GET
-                        @ .key, .value
+                        @get .key, .value
                     when SET
                         @set .key, .value
         @queue = nil
-        T.event_manager\fire 'SHAREXP_DB_LOADED', @
+        em\fire 'SHAREXP_DB_LOADED', @
 
     -- Probably not needed
     save: =>
@@ -83,21 +95,23 @@ class Database
                 entry = item if item.key == key
             entry.value if entry else default
 
-    set: (key, value) =>
+    set: (key, value, silent) =>
         if @loaded
             t = parse_key @, key
             name = extract_name key
             prepare @, name, value, t
             t[name]._VALUE = value
+            send_update @, key unless silent
         else
             @log\warn 'set called before load, queueing set action on %s', key
             @enqueue SET, key, value
 
-    reset: (key) =>
+    reset: (key, silent) =>
         t = parse_key @, key
         name = extract_name key
         return if type(t[name]) != 'table'
         t[name]._VALUE = t[name]._DEFAULT
+        send_update @, key unless silent
 
 T.database = Database NAME .. 'DB'
 T.database_char = Database NAME .. 'CharDB'
@@ -108,7 +122,7 @@ check_global = (db) ->
 
 parse_key = (db, key) ->
     key = key\lower!
-    keys = [token for token in key\gmatch DELIMITER_TOKEN_MATCH]
+    keys = extract_keys key
     check_global!
     t = db.global
     for i = 1, #keys - 1
@@ -119,22 +133,26 @@ parse_key = (db, key) ->
 extract_name = (key) ->
     key\match DELIMITER_NAME_MATCH
 
+extract_keys = (key) ->
+    [token for token in key\gmatch DELIMITER_TOKEN_MATCH]
+
 prepare = (db, key, default, tbl) ->
     check_global!
     tbl = tbl or db.global
     if type(tbl[key]) != 'table'
         tbl[key] = { _VALUE: default, _DEFAULT: default }
     else
+        default_type = type default
         with tbl[key]
-            ._VALUE = default if type(._VALUE) != type default
+            ._VALUE = default if type(._VALUE) != default_type and default_type != 'nil'
             if type(._DEFAULT) == 'table'
-                ._DEFAULT = default unless equal ._DEFAULT, default
+                ._DEFAULT = default unless default_type == 'nil' or equal ._DEFAULT, default
             else
-                ._DEFAULT = default if ._DEFAULT != default
+                ._DEFAULT = default if ._DEFAULT != default and default_type != 'nil'
 
 mt =
-    __call: (tbl, key, default) ->
-        tbl\get key, default
+    __call: (tbl, ...) ->
+        tbl\get ...
 
 setmetatable T.database, mt
 setmetatable T.database_char, mt
