@@ -95,7 +95,7 @@ T.xp_manager =
 
 is_any_nil = (...) ->
     for item in *{...}
-        if type(item) == nil then return true
+        if type(item) == 'nil' then return true
     false
 
 xp = T.xp_manager
