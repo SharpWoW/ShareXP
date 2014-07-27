@@ -40,6 +40,7 @@ local check_global, parse_key, extract_name, extract_keys, prepare
 class Database
     GET = 0
     SET = 1
+    RESET = 2
 
     -- This will make sure updates are fired for the key
     -- and any parent keys, for example:
@@ -59,7 +60,7 @@ class Database
     enqueue: (method, key, value) =>
         if @loaded
             error 'Database.enqueue called when db loaded'
-        if method != GET and method != SET
+        if method != GET and method != SET and method != RESET
             error 'Database.enqueue called with invalid method arg: ' .. method
         @queue[#@queue + 1] = {:method, :key, :value}
 
@@ -74,6 +75,8 @@ class Database
                         @get .key, .value
                     when SET
                         @set .key, .value
+                    when RESET
+                        @reset .key
         @queue = nil
         em\fire 'SHAREXP_DB_LOADED', @
 
@@ -83,10 +86,10 @@ class Database
 
     get: (key, default) =>
         if @loaded
-            t = parse_key @, key
+            tbl = parse_key @, key
             name = extract_name key
-            prepare @, name, default, t
-            t[name]._VALUE
+            prepare tbl, name, default
+            tbl[name]._VALUE, tbl[name]._DEFAULT
         else
             @log\warn 'get called before load, returning approximate value for %s', key
             @enqueue GET, key, default
@@ -95,30 +98,41 @@ class Database
                 entry = item if item.key == key
             entry.value if entry else default
 
+    get_value: (key, default) =>
+        (@get key, default)
+
+    get_default: (key) =>
+        if @loaded
+            _, default = @get key
+            default
+        else
+            @log\warn 'get_default called before load, returning nil for %s', key
+            nil
+
     set: (key, value, silent) =>
         if @loaded
-            t = parse_key @, key
+            tbl = parse_key @, key
             name = extract_name key
-            prepare @, name, value, t
-            t[name]._VALUE = value
+            prepare tbl, name, value
+            tbl[name]._VALUE = value
             send_update @, key unless silent
         else
             @log\warn 'set called before load, queueing set action on %s', key
             @enqueue SET, key, value
 
     reset: (key, silent) =>
-        t = parse_key @, key
-        name = extract_name key
-        return if type(t[name]) != 'table'
-        t[name]._VALUE = t[name]._DEFAULT
-        send_update @, key unless silent
+        if @loaded
+            tbl = parse_key @, key
+            name = extract_name key
+            return if type(tbl[name]) != 'table'
+            tbl[name]._VALUE = tbl[name]._DEFAULT
+            send_update @, key unless silent
+        else
+            @log\warn 'reset called before load, queueing reset action on %s', key
+            @enqueue RESET, key
 
 T.database = Database NAME .. 'DB'
 T.database_char = Database NAME .. 'CharDB'
-
-check_global = (db) ->
-    if type(db.global) != 'table'
-        error 'Tried to perform a database operation before database loaded'
 
 parse_key = (db, key) ->
     key = key\lower!
@@ -136,9 +150,7 @@ extract_name = (key) ->
 extract_keys = (key) ->
     [token for token in key\gmatch DELIMITER_TOKEN_MATCH]
 
-prepare = (db, key, default, tbl) ->
-    check_global!
-    tbl = tbl or db.global
+prepare = (tbl, key, default) ->
     if type(tbl[key]) != 'table'
         tbl[key] = { _VALUE: default, _DEFAULT: default }
     else

@@ -21,7 +21,7 @@
 NAME, T = ...
 
 import Logger, log from T
-import decorate from T.misc
+import decorate, deserialize from T.misc
 
 {database: db} = T
 
@@ -65,9 +65,24 @@ T.command_manager =
 cm = T.command_manager
 register = cm\register
 
-register 'd', (arg) ->
+register 'de', (arg) ->
     if arg then T\set_debug arg\match '^[ye]' and true or false else T\toggle_debug!
     log\notice 'Debugging %s!', T\is_debug_enabled! and 'ENABLED' or 'DISABLED'
+
+register 'db$', (arg, key, value) ->
+    if not T\is_debug_enabled!
+        return log\error 'For safety reasons, db command is only operable in debug mode'
+    if not arg
+        return log\error 'Usage: <key> [value]'
+
+    if not value
+        log\info 'Value of %s is %s (default: %s)', key, db key
+    else
+        valid, result = deserialize arg\match "^#{key} (.*)"
+        if not valid
+            return log\error 'Invalid value given, Lua error: %s', result
+        db\set key, result
+        log\info 'Value of %s set to %s', key, db key
 
 register 'l', (arg, section, s_arg, ss_arg) ->
     if not arg

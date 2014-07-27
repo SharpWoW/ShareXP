@@ -20,7 +20,7 @@
 
 NAME, T = ...
 
-{ :GetRealmName, :LARGE_NUMBER_SEPERATOR } = _G
+{:GetRealmName, :LARGE_NUMBER_SEPERATOR} = _G
 
 T.string =
     split: (str, delim using nil) ->
@@ -42,7 +42,7 @@ T.string =
 T.number =
     -- Format function courtesy of SDPhantom from WoWInterface
     -- http://www.wowinterface.com/forums/showpost.php?p=270917&postcount=11
-    format: (number using nil) ->
+    format: (number using LARGE_NUMBER_SEPERATOR) ->
         number = tostring number
         number\gsub '^(%d)(%d+)', (pre, post) ->
             pre .. post\reverse!\gsub('(%d%d%d)', '%1' .. LARGE_NUMBER_SEPERATOR)\reverse!
@@ -50,7 +50,7 @@ T.number =
 local equal
 
 T.table =
-    equal: (first, second using nil) ->
+    equal: (first, second using equal) ->
         first_type = type first
         second_type = type second
         return false if first_type != 'table' or second_type != 'table'
@@ -66,7 +66,7 @@ T.table =
 import equal from T.table
 
 T.misc =
-    fix_name: (name, realm using nil) ->
+    fix_name: (name, realm using GetRealmName) ->
         dashindex = name\find '-'
         return name if dashindex and dashindex != name\len!
         return name .. '-' .. realm\gsub '%s', '' if realm
@@ -75,3 +75,11 @@ T.misc =
 
     decorate: (text, color using nil) ->
         '\127cff%s%s\127r'\format color, text
+
+    -- This basically just calls loadstring on a text
+    -- representation of a Lua object like a number,
+    -- string or table
+    deserialize: (str) ->
+        func = assert loadstring 'return ' .. str
+        setfenv func, {} -- Don't give access to anything
+        pcall func
