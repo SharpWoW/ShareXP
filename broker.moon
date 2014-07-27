@@ -20,7 +20,7 @@
 
 NAME, T = ...
 
-import log from T
+{:log, :number, xp_manager: xp} = T
 
 {:IsControlKeyDown, :IsShiftKeyDown, :LibStub} = _G
 
@@ -40,7 +40,17 @@ click_handlers =
 obj = ldb\NewDataObject "Broker_#{NAME}", data
 
 obj.OnTooltipShow = =>
-    @AddLine 'Allan please add information'
+    if xp\has_data!
+        @AddLine 'XP data for party'
+        @AddLine ' ' -- Separator
+        for name, data in xp.data
+            with data
+                left = '%s [%d]'\format .friendly_name, .current_level
+                right = '%s/%s'\format number.format(.current_xp), number.format(.max_xp)
+                @AddDoubleLine left, right, 1, 1, 1, 1, 1, 1
+    else
+        @AddLine 'No data at the moment'
+    @AddLine ' ' -- Separator
     @AddDoubleLine 'Left Click', 'Announce XP (Smart)', 0, 1, 0, 0, 1, 0
 
 obj.OnClick = (button) =>

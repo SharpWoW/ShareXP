@@ -44,6 +44,9 @@ T.xp_manager =
     max_level: 255 -- Placeholder/fallback value replaced at load
     data: {}
 
+    has_data: =>
+        #@data > 0
+
     update: (name, current_level, max_level, current_xp, max_xp) =>
         name = misc.fix_name name
         current_level = tonumber current_level

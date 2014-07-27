@@ -39,6 +39,17 @@ T.string =
                 t[#t + 1] = token
         t
 
+T.number =
+    format: (number) ->
+        number = tostring number
+        return number if number\match '[^%d%.]' -- Only format normal numbers
+        left, right = number\match '^(%d+)(.*)' -- We do not want decimals
+        len = left\len!
+        return number if len < 4
+        mod = len % 3
+        left = left\sub(1, mod)\gsub('%d$', '%1,') .. left\sub(mod + 1)\gsub '%d%d%d', '%1,'
+        (left\sub 1, left\len! - 1) .. right
+
 local equal
 
 T.table =
