@@ -69,14 +69,14 @@ def is_file_ignored(file):
     return False
 
 def lint_addon():
-    ret = call(["moonc", "-l", "*.moon"])
+    ret = call(["moonc", "-l", "."])
     if ret != 0:
         log('FAILURE: moonc linter exited with non-zero return code')
         sys.exit(1)
 
 def compile_addon():
     lint_addon()
-    ret = call(["moonc", "-t", "lua", "*.moon"])
+    ret = call(["moonc", "-t", "lua", "."])
     if ret != 0:
         log('FAILURE: moonc compile exited with non-zero return code')
         sys.exit(1)
