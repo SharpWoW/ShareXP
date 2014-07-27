@@ -132,8 +132,8 @@ class Database
             @log\warn 'reset called before load, queueing reset action on %s', key
             @enqueue RESET, key
 
-T.database = Database NAME .. 'DB'
-T.database_char = Database NAME .. 'CharDB'
+database = Database NAME .. 'DB'
+database_char = Database NAME .. 'CharDB'
 
 parse_key = (db, key) ->
     key = key\lower!
@@ -163,9 +163,11 @@ prepare = (tbl, key, default) ->
             else
                 ._DEFAULT = default if ._DEFAULT != default and default_type != 'nil'
 
-mt =
-    __call: (tbl, ...) ->
-        tbl\get ...
+__call: (tbl, ...) ->
+    tbl\get ...
 
-setmetatable T.database, mt
-setmetatable T.database_char, mt
+getmetatable(database).__call = __call
+getmetatable(database_char).__call = __call
+
+T.database = database
+T.database_char = database_char
