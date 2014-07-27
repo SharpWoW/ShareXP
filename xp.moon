@@ -22,7 +22,7 @@ NAME, T = ...
 
 import log, misc from T
 
-comm = T.comm_manager
+{comm_manager: comm, event_manager: em} = T
 
 local is_any_nil
 
@@ -65,7 +65,7 @@ T.xp_manager =
             .max_level = max_level
             .current_xp = current_xp
             .max_xp = max_xp
-        T.event_manager\fire 'SHAREXP_XP_UPDATED'
+        em\fire 'SHAREXP_XP_UPDATED'
         log\debug 'XP updated for %s', data.friendly_name
 
     send_xp: =>
@@ -92,6 +92,7 @@ T.xp_manager =
             unless group[k]
                 log\debug 'Removing %s from group, no longer present', k
                 @data[k] = nil
+                em\fire 'SHAREXP_XP_UPDATED'
 
 is_any_nil = (...) ->
     for item in *{...}
