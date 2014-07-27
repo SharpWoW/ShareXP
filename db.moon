@@ -85,8 +85,9 @@ prepare = (db, key, default, tbl) ->
     if type(tbl[key]) != 'table'
         tbl[key] = { _VALUE: default, _DEFAULT: default }
     else
-        tbl[key]._VALUE = default if type(tbl[key]._VALUE) != type default
-        tbl[key]._DEFAULT = default if tbl[key]._DEFAULT != default
+        with tbl[key]
+            ._VALUE = default if type(._VALUE) != type default
+            ._DEFAULT = default if ._DEFAULT != default
 
 mt =
     __call: (tbl, key, default) ->
