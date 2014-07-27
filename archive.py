@@ -9,6 +9,7 @@ import re
 import sys
 import fnmatch
 import zipfile
+import glob
 from subprocess import call
 
 SCRIPT = sys.argv[0]
@@ -69,18 +70,21 @@ def is_file_ignored(file):
     return False
 
 def lint_addon():
-    ret = call(["moonc", "-l", "."])
+    files = glob.glob('*.moon')
+    ret = call(["moonc", "-l"] + files)
     if ret != 0:
         log('FAILURE: moonc linter exited with non-zero return code')
         sys.exit(1)
 
 def compile_addon():
     lint_addon()
-    ret = call(["moonc", "-t", "lua", "."])
+    moonfiles = glob.glob('*.moon')
+    ret = call(["moonc", "-t", "lua"] + moonfiles)
     if ret != 0:
         log('FAILURE: moonc compile exited with non-zero return code')
         sys.exit(1)
-    ret = call(["luac", "-p", "lua/*.lua"])
+    luafiles = glob.glob('lua/*.lua')
+    ret = call(["luac", "-p"] + luafiles)
     if ret != 0:
         log('FAILURE: luac parse exited with non-zero return code')
         sys.exit(1)
