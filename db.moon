@@ -58,6 +58,9 @@ class Database
         @queue = {}
         em\fire 'SHAREXP_DB_CREATED', @
 
+    __call: (...) =>
+        @get ...
+
     enqueue: (method, key, value) =>
         if @loaded
             error 'Database.enqueue called when db loaded'
@@ -162,12 +165,6 @@ prepare = (tbl, key, default) ->
                 ._DEFAULT = default unless default_type == 'nil' or equal ._DEFAULT, default
             else
                 ._DEFAULT = default if ._DEFAULT != default and default_type != 'nil'
-
-__call: (tbl, ...) ->
-    tbl\get ...
-
-getmetatable(database).__call = __call
-getmetatable(database_char).__call = __call
 
 T.database = database
 T.database_char = database_char
