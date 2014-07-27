@@ -15,8 +15,8 @@ lua\utils.lua
 
 lua\init.lua
 lua\events.lua
-lua\db.lua
 lua\log.lua
+lua\db.lua
 lua\comm.lua
 lua\main.lua
 lua\commands.lua

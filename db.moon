@@ -56,6 +56,7 @@ class Database
         @log = T.Logger 'db.' .. @global_name
         @loaded = false
         @queue = {}
+        em\fire 'SHAREXP_DB_CREATED', @
 
     enqueue: (method, key, value) =>
         if @loaded

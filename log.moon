@@ -20,11 +20,11 @@
 
 NAME, T = ...
 
-db = T.database
-
 import decorate from T.misc
 
 import format from string
+
+local db
 
 class T.Logger
     @levels:
@@ -41,6 +41,7 @@ class T.Logger
     new: (@name, @color) =>
 
     log: (level, ...) =>
+        if not db then return print level, ... -- Emergency fallback
         return unless db 'log', true
         return if level == @@levels.DEBUG and (not db.loaded or not db 'debug', false)
         return if level < db 'log.level', @@levels.INFO
@@ -74,6 +75,12 @@ for id, level in pairs Logger.levels
 log = Logger('main')
 
 T.log = log
+
+load_db = (database) =>
+    db = database if database.global_name == 'ShareXPDB'
+
+T.SHAREXP_DB_CREATED = load_db
+T.SHAREXP_DB_LOADED = load_db
 
 T.SHAREXP_DB_UPDATED = (db, key) =>
     return unless db.global_name == 'ShareXPDB'
