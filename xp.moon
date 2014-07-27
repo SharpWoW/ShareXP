@@ -94,8 +94,8 @@ T.xp_manager =
                 @data[k] = nil
 
 is_any_nil = (...) ->
-    for i = 1, select '#', ...
-        if type((select i, ...)) == nil then return true
+    for item in *{...}
+        if type(item) == nil then return true
     false
 
 xp = T.xp_manager
