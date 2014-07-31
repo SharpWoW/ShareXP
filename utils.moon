@@ -74,7 +74,7 @@ T.misc =
         name .. '-' .. GetRealmName!\gsub '%s', ''
 
     decorate: (text, color using nil) ->
-        '\127cff%s%s\127r'\format color, text
+        '|cff%s%s|r'\format color, text
 
     -- This basically just calls loadstring on a text
     -- representation of a Lua object like a number,
