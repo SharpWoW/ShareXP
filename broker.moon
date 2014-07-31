@@ -31,7 +31,7 @@ data =
     label: NAME
     icon: "Interface\\AddOns\\#{NAME}\\icon.tga"
     tocname: NAME
-    text: 'Allan please add something useful'
+    text: NAME .. ': Allan add something here'
 
 click_handlers =
     none:
