@@ -3,6 +3,7 @@
 	[
 		{
 			"name": "Run archive.py",
+			"working_dir": "${project_path:.}",
 			"shell_cmd": "python archive.py ShareXP 0"
 		}
 	],
