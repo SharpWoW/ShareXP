@@ -22,7 +22,7 @@ NAME, T = ...
 
 import log, misc from T
 
-{comm_manager: comm, event_manager: em} = T
+{comm_manager: comm, event_manager: em, localization: L} = T
 
 local is_any_nil
 
@@ -55,7 +55,7 @@ T.xp_manager =
         max_xp = tonumber max_xp
 
         if is_any_nil current_level, max_level, current_xp, max_xp
-            return log\error 'Invalid data received from %s', name
+            return log\error L.xp.invalid_data, name
 
         unless @data[name]
             @data[name] = {}
@@ -69,18 +69,18 @@ T.xp_manager =
             .current_xp = current_xp
             .max_xp = max_xp
         em\fire 'SHAREXP_XP_UPDATED'
-        log\debug 'XP updated for %s', data.friendly_name
+        log\debug L.xp.updated, data.friendly_name
 
     send_xp: =>
         lvl = UnitLevel 'player'
         xp = UnitXP 'player'
         max_xp = UnitXPMax 'player'
         comm\send 'PARTY', 'xpupdate', lvl, @max_level, xp, max_xp
-        log\debug 'Sent XP update to party'
+        log\debug L.xp.sent_update
 
     request_xp: =>
         comm\send 'PARTY', 'xprequest'
-        log\debug 'Sent XP request to party'
+        log\debug L.xp.sent_request
 
     check_group: =>
         num = GetNumSubgroupMembers LE_PARTY_CATEGORY_HOME
@@ -93,7 +93,7 @@ T.xp_manager =
 
         for k, _ in pairs @data
             unless group[k]
-                log\debug 'Removing %s from group, no longer present', k
+                log\debug L.xp.removing, k
                 @data[k] = nil
                 em\fire 'SHAREXP_XP_UPDATED'
 
@@ -110,11 +110,11 @@ comm\add 'xpupdate', (channel, sender, ...) ->
     -- 2: max level
     -- 3: current xp
     -- 4: max xp
-    log\debug 'Received XP update from %s:%s', channel, sender
+    log\debug L.xp.received_update, channel, sender
     xp\update sender, ...
 
 comm\add 'xprequest', (channel, sender) ->
-    log\debug 'Received XP request from %s:%s', channel, sender
+    log\debug L.xp.received_request, channel, sender
     xp\send_xp!
 
 T.PLAYER_ENTERING_WORLD = =>

@@ -20,7 +20,7 @@
 
 NAME, T = ...
 
-{:log, :number, xp_manager: xp} = T
+{localization: L, :log, :number, xp_manager: xp} = T
 
 {:IsControlKeyDown, :IsShiftKeyDown, :LibStub} = _G
 
@@ -51,7 +51,7 @@ obj.OnTooltipShow = =>
     else
         @AddLine 'No data at the moment'
     @AddLine ' ' -- Separator
-    @AddDoubleLine 'Left Click', 'Announce XP (Smart)', 0, 1, 0, 0, 1, 0
+    @AddDoubleLine L.common.leftclick, L.actions.announce.smart, 0, 1, 0, 0, 1, 0
 
 obj.OnClick = (button) =>
     mod = ((IsControlKeyDown! and 'ctrl') or (IsShiftKeyDown! and 'shift')) or 'none'

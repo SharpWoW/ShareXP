@@ -22,6 +22,8 @@ NAME, T = ...
 
 import decorate from T.misc
 
+{localization: L} = T
+
 import format from string
 
 local db
@@ -36,7 +38,7 @@ class T.Logger
         NOTICE: 5
 
     @level_to_prefix: (level) =>
-        @prefixes[level] or 'UNKNOWN'
+        @prefixes[level] or L.common.unknown\upper!
 
     @prefix_to_level: (prefix) =>
         prefix = prefix\upper!

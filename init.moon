@@ -20,4 +20,4 @@
 
 NAME, T = ...
 
-T.frame = CreateFrame "Frame"
+T.frame = CreateFrame 'Frame'
