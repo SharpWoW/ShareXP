@@ -52,12 +52,12 @@ def clean_directory(dst):
         os.makedirs(dst)
     log('Directory cleanup completed: {0}', dst)
 
-build_dirs = ['build', 'lua']
+build_dirs = ['build', 'lua', os.path.join('lua', 'locales')]
 
 for build_dir in build_dirs:
     clean_directory(build_dir)
 
-additional_files = ["LICENSE", "README.md", TOC_FILENAME]
+additional_files = ["LICENSE", "README.md", TOC_FILENAME, 'load_locales.xml']
 
 ignored = ['/.*', SCRIPT, '*.moon', '*.zip']
 
@@ -69,6 +69,14 @@ def is_file_ignored(file):
             return True
     return False
 
+def compile_moon(path, target):
+    files = glob.glob(path)
+    log('Compiling MoonScript files in {0} to {1}', path, target)
+    ret = call(['moonc', '-t', target] + files)
+    if ret != 0:
+        log('FAILURE: moonc compile of {0} exited with non-zero return code', path)
+        sys.exit(1)
+
 def lint_addon():
     files = glob.glob('*.moon')
     ret = call(["moonc", "-l"] + files)
@@ -78,12 +86,9 @@ def lint_addon():
 
 def compile_addon():
     lint_addon()
-    moonfiles = glob.glob('*.moon')
-    ret = call(["moonc", "-t", "lua"] + moonfiles)
-    if ret != 0:
-        log('FAILURE: moonc compile exited with non-zero return code')
-        sys.exit(1)
-    luafiles = glob.glob('lua/*.lua')
+    compile_moon('*.moon', 'lua')
+    compile_moon(os.path.join('locales', '*.moon'), 'lua')
+    luafiles = glob.glob(os.path.join('lua', '**', '*.lua'))
     ret = call(["luac", "-p"] + luafiles)
     if ret != 0:
         log('FAILURE: luac parse exited with non-zero return code')
@@ -128,6 +133,6 @@ ignored.append(zipname)
 log('Building zip file at {0}', zipname)
 
 with zipfile.ZipFile(zipname, 'w', zipfile.ZIP_DEFLATED) as zf:
-    make_zip(['libs', 'lua', 'LICENSE', 'README.md', 'ShareXP.toc'], zf)
+    make_zip(['libs', 'lua'] + additional_files, zf)
     zf.close()
     log('DONE! Zip successfully created: {0}!', zipname)

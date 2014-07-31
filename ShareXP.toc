@@ -13,6 +13,8 @@ libs\LibDataBroker-1-1\LibDataBroker-1.1.lua
 # utils.lua contains lua functions independent of the AddOn environment
 lua\utils.lua
 
+load_locales.xml
+
 lua\init.lua
 lua\events.lua
 lua\log.lua
