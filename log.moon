@@ -24,7 +24,7 @@ import decorate from T.misc
 
 {localization: L} = T
 
-import format from string
+import format, upper from string
 
 local db
 
@@ -38,7 +38,7 @@ class T.Logger
         NOTICE: 5
 
     @level_to_prefix: (level) =>
-        @prefixes[level] or L.common.unknown\upper!
+        @prefixes[level] or L.unknown\upper!
 
     @prefix_to_level: (prefix) =>
         prefix = prefix\upper!
@@ -93,20 +93,20 @@ T.SHAREXP_DB_UPDATED = (db, key) =>
     return unless key\match '^log'
     switch key
         when 'log'
-            log\notice 'Logging %s.', db('log') and 'enabled' or 'disabled'
+            log\notice L.log_status_changed, db('log') and L.enabled or L.disabled
         when 'log.color'
-            log\notice 'Log coloring %s.', db('log.color') and 'enabled' or 'disabled'
+            log\notice L.log_coloring_changed, db('log.color') and L.enabled or L.disabled
         when 'log.level'
-            log\notice 'Logging level changed to %s.', Logger\level_to_prefix db 'log.level'
+            log\notice L.log_level_changed, Logger\level_to_prefix db 'log.level'
         when 'log.color.name'
             color = Logger.colors.name!
-            msg = 'Name color changed to %s.'\format color
+            msg = L 'log_color_changed', L.name\gsub('^.', upper), color
             log\notice decorate(msg, color)
         else
-            prefix = key\match '^log\.color\.level\.(%w+)$'
+            prefix = key\match '^log%.color%.level%.(%w+)$'
             if prefix
                 prefix = prefix\upper!
                 level = Logger\prefix_to_level prefix
                 color = Logger.colors.levels[level]!
-                msg = '%s color changed to %s.'\format prefix, color
+                msg = L 'log_color_changed', prefix, color
                 log\notice decorate(msg, color)

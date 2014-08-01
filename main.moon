@@ -20,7 +20,9 @@
 
 NAME, T = ...
 
-assert type(T.event_manager) == 'table', 'LOAD ORDER ERROR: main.moon was loaded before events.moon'
+L = T.localization
+
+assert type(T.event_manager) == 'table', L 'loaderror', 'main.moon', 'events.moon'
 
 {database: db, event_manager: em} = T
 

@@ -20,7 +20,9 @@
 
 NAME, T = ...
 
-assert type(T.frame) == 'table', 'LOAD ORDER ERROR: events.moon loaded before init.moon'
+L = T.localization
+
+assert type(T.frame) == 'table', L 'loaderror', 'events.moon', 'init.moon'
 
 EVENT_NAME_PATTERN = '^[A-Z_]+$'
 

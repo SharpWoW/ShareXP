@@ -41,7 +41,7 @@ obj = ldb\NewDataObject "Broker_#{NAME}", data
 
 obj.OnTooltipShow = =>
     if xp\has_data!
-        @AddLine 'XP data for party'
+        @AddLine L.b_header_xp
         @AddLine ' ' -- Separator
         for name, data in xp.data
             with data
@@ -49,9 +49,9 @@ obj.OnTooltipShow = =>
                 right = '%s/%s'\format number.format(.current_xp), number.format(.max_xp)
                 @AddDoubleLine left, right, 1, 1, 1, 1, 1, 1
     else
-        @AddLine 'No data at the moment'
+        @AddLine L.b_header_empty
     @AddLine ' ' -- Separator
-    @AddDoubleLine L.common.leftclick, L.actions.announce.smart, 0, 1, 0, 0, 1, 0
+    @AddDoubleLine L.leftclick, L.b_announce_smart, 0, 1, 0, 0, 1, 0
 
 obj.OnClick = (button) =>
     mod = ((IsControlKeyDown! and 'ctrl') or (IsShiftKeyDown! and 'shift')) or 'none'

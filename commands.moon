@@ -40,7 +40,7 @@ T.command_manager =
                     command = cmd
                     break
 
-        return log\error L.errors.invalid_command unless command
+        return log\error L.invalid_command unless command
 
         args = {}
 
@@ -67,32 +67,32 @@ register = cm\register
 
 register 'de', (arg) ->
     T\set_debug arg\match('^[ye]') and true or false if arg else T\toggle_debug!
-    log\notice L.commands.debug.status, T\is_debug_enabled! and L.common.enabled or L.common.disabled
+    log\notice L.debug_status, T\is_debug_enabled! and L.enabled or L.disabled
 
 register 'db$', (arg, key, value) ->
     if not T\is_debug_enabled!
-        return log\error L.commands.db.safety_notice
+        return log\error L.db_safety_notice
     if not arg
-        return log\error L.commands.db.usage
+        return log\error L.db_usage
 
     if not value
-        log\info L.commands.db.current, key, tostring(db key), tostring db\get_default key
+        log\info L.db_current, key, tostring(db key), tostring db\get_default key
     elseif value == '_RESET'
         db\reset key
-        log\info L.commands.db.reset, key, tostring db key
+        log\info L.db_reset, key, tostring db key
     else
         value = arg\match("^#{key} (.*)")
         -- This makes it easier to set strings in the db
         value = tostring value unless value\match '^%d+$' or value\match '^\{.*\}$'
         valid, result = deserialize value
         if not valid
-            return log\error L.commands.db.invalid, result
+            return log\error L.db_invalid, result
         db\set key, result
-        log\info L.commands.db.set, key, tostring db key
+        log\info L.db_set, key, tostring db key
 
 register 'l', (arg, section, s_arg, ss_arg) ->
     if not arg
-        return log\notice L.commands.log.status, db('log') and L.common.enabled or L.common.disabled
+        return log\notice L.log_status, db('log') and L.enabled or L.disabled
     elseif arg\match '^[ts]' -- Log [t]oggle/[s]witch
         return db\set 'log', (not db 'log', true)
     elseif arg\match('^[ye]') or arg\match '^on' -- Log [y]es, [e]nable, [on]
@@ -109,7 +109,7 @@ register 'l', (arg, section, s_arg, ss_arg) ->
         if not s_arg
             level = db 'log.level', Logger.levels.INFO
             prefix = Logger\level_to_prefix level
-            return log\notice L.commands.log.current_level, prefix, level
+            return log\notice L.log_current_level, prefix, level
         level = s_arg\match '^%d+'
         level = tonumber level
         if not level -- Attempt to parse a text value
@@ -123,17 +123,17 @@ register 'l', (arg, section, s_arg, ss_arg) ->
     elseif section\match '^c' -- Log [c]olor
         if not s_arg
             name_color = Logger.colors.name!
-            log\notice decorate(L.commands.log.current_color, name_color), L.common.name, name_color
+            log\notice decorate(L.log_current_color, name_color), L.name, name_color
             for level, func in pairs Logger.colors.levels
                 color = func!
                 prefix = Logger\level_to_prefix level
-                log\notice decorate(L.commands.log.current_color, color), prefix, color
+                log\notice decorate(L.log_current_color, color), prefix, color
         elseif s_arg\match('^[ye]') or s_arg\match '^on'
             db\set 'log.color', true
         elseif s_arg\match('^di') or s_arg\match('^of') or s_arg\match '^not'
             db\set 'log.color', false
         elseif not ss_arg
-            log\error L.commands.log.color_usage
+            log\error L.log_color_usage
         elseif s_arg\match '^na' -- [na]me
             db\set 'log.color.name', ss_arg
         else
@@ -144,7 +144,7 @@ register 'l', (arg, section, s_arg, ss_arg) ->
                     level = lvl
                     prefix = pre\lower!
                     break
-            return log\error L.commands.log.invalid_prefix unless prefix
+            return log\error L.log_invalid_prefix unless prefix
             db\set 'log.color.level.' .. prefix, ss_arg
 
 for i, v in ipairs {'sharexp', 'sxp'}

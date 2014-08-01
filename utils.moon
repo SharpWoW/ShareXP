@@ -80,6 +80,7 @@ T.misc =
     -- representation of a Lua object like a number,
     -- string or table
     deserialize: (str) ->
-        func = assert loadstring 'return ' .. str
+        func, err = loadstring "return #{str}"
+        return false, err unless type(func) == 'function'
         setfenv func, {} -- Don't give access to anything
         pcall func

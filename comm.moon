@@ -68,7 +68,7 @@ T.comm_manager =
             message ..= DELIMITER .. v
 
         if message\len! > MAX_MESSAGE_LENGTH
-            log\warn L.errors.comm.message_length, kind, MAX_MESSAGE_LENGTH
+            log\warn L.comm_message_length, kind, MAX_MESSAGE_LENGTH
 
         SendAddonMessage @prefix, message, channel, target
 
@@ -100,4 +100,4 @@ T.CHAT_MSG_ADDON = (prefix, message, channel, sender) =>
 
 T.SHAREXP_LOADED = =>
     RegisterAddonMessagePrefix comm.prefix
-    log\debug L.comm.prefix_registered, comm.prefix
+    log\debug L.comm_prefix_registered, comm.prefix

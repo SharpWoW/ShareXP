@@ -20,9 +20,12 @@
 
 NAME, T = ...
 
-import log, misc from T
-
-{comm_manager: comm, event_manager: em, localization: L} = T
+{
+    comm_manager: comm
+    event_manager: em
+    localization: L
+    :log, :misc
+} = T
 
 local is_any_nil
 
@@ -69,18 +72,18 @@ T.xp_manager =
             .current_xp = current_xp
             .max_xp = max_xp
         em\fire 'SHAREXP_XP_UPDATED'
-        log\debug L.xp.updated, data.friendly_name
+        log\debug L.xp_updated, data.friendly_name
 
     send_xp: =>
         lvl = UnitLevel 'player'
         xp = UnitXP 'player'
         max_xp = UnitXPMax 'player'
         comm\send 'PARTY', 'xpupdate', lvl, @max_level, xp, max_xp
-        log\debug L.xp.sent_update
+        log\debug L.xp_sent_update
 
     request_xp: =>
         comm\send 'PARTY', 'xprequest'
-        log\debug L.xp.sent_request
+        log\debug L.xp_sent_request
 
     check_group: =>
         num = GetNumSubgroupMembers LE_PARTY_CATEGORY_HOME
@@ -110,11 +113,11 @@ comm\add 'xpupdate', (channel, sender, ...) ->
     -- 2: max level
     -- 3: current xp
     -- 4: max xp
-    log\debug L.xp.received_update, channel, sender
+    log\debug L.xp_received_update, channel, sender
     xp\update sender, ...
 
 comm\add 'xprequest', (channel, sender) ->
-    log\debug L.xp.received_request, channel, sender
+    log\debug L.xp_received_request, channel, sender
     xp\send_xp!
 
 T.PLAYER_ENTERING_WORLD = =>

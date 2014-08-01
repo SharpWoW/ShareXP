@@ -63,9 +63,9 @@ class Database
 
     enqueue: (method, key, value) =>
         if @loaded
-            error L.db.errors.enqueue_loaded
+            error L.db_enqueue_loaded
         if method != GET and method != SET and method != RESET
-            error L.db.errors 'enqueue_invalid', tostring method
+            error L.db_enqueue_invalid tostring method
         @queue[#@queue + 1] = {:method, :key, :value}
 
     load: =>
@@ -95,7 +95,7 @@ class Database
             prepare tbl, name, default
             tbl[name]._VALUE, tbl[name]._DEFAULT
         else
-            @log\warn L.db.errors.get_load, key
+            @log\warn L.db_get_load, key
             @enqueue GET, key, default
             local entry
             for item in *@queue
@@ -110,7 +110,7 @@ class Database
             _, default = @get key
             default
         else
-            @log\warn L.db.errors.get_default_load, key
+            @log\warn L.db_get_default_load, key
             nil
 
     set: (key, value, silent) =>
@@ -121,7 +121,7 @@ class Database
             tbl[name]._VALUE = value
             send_update @, key unless silent
         else
-            @log\warn L.db.errors.set_load, key
+            @log\warn L.db_set_load, key
             @enqueue SET, key, value
 
     reset: (key, silent) =>
@@ -132,7 +132,7 @@ class Database
             tbl[name]._VALUE = tbl[name]._DEFAULT
             send_update @, key unless silent
         else
-            @log\warn L.db.errors.reset_load, key
+            @log\warn L.db_reset_load, key
             @enqueue RESET, key
 
 T.database = Database NAME .. 'DB'
