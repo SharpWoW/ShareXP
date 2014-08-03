@@ -82,13 +82,13 @@ log = Logger('main')
 
 T.log = log
 
-load_db = (database) =>
+load_db = (database) ->
     db = database if database.global_name == 'ShareXPDB'
 
 T.SHAREXP_DB_CREATED = load_db
 T.SHAREXP_DB_LOADED = load_db
 
-T.SHAREXP_DB_UPDATED = (db, key) =>
+T.SHAREXP_DB_UPDATED = (db, key) ->
     return unless db.global_name == 'ShareXPDB'
     return unless key\match '^log'
     switch key

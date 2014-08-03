@@ -26,7 +26,7 @@ assert type(T.event_manager) == 'table', L 'loaderror', 'main.moon', 'events.moo
 
 {database: db, event_manager: em} = T
 
-T.ADDON_LOADED = (name) =>
+T.ADDON_LOADED = (name) ->
     return if name != NAME
     db\load!
     db 'debug', false

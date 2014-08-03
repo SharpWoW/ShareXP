@@ -76,6 +76,6 @@ obj.OnLeave = =>
     GameTooltip\Hide!
     tooltip_visible = false
 
-T.SHAREXP_XP_UPDATED = =>
+T.SHAREXP_XP_UPDATED = ->
     obj.text = "#{NAME}: Allan please add updating text"
     update! if tooltip_visible

@@ -24,10 +24,10 @@ NAME, T = ...
     comm_manager: comm
     event_manager: em
     localization: L
-    :log, :misc
+    :log
+    misc:
+        :fix_name, :is_any_nil
 } = T
-
-local is_any_nil
 
 {
     :GetExpansionLevel, :GetRealmName, :GetNumSubgroupMembers
@@ -51,7 +51,7 @@ T.xp_manager =
         #@data > 0
 
     update: (name, current_level, max_level, current_xp, max_xp) =>
-        name = misc.fix_name name
+        name = fix_name name
         current_level = tonumber current_level
         max_level = tonumber max_level
         current_xp = tonumber current_xp
@@ -64,7 +64,7 @@ T.xp_manager =
             @data[name] = {}
             realm = name\match '-(.+)$'
             local_realm = GetRealmName!\gsub '%s', ''
-            @data[name].friendly_name = (realm == local_realm) and name\match '(.+)-' or name
+            @data[name].friendly_name = (realm == local_realm) and name\match('(.+)-') or name
 
         data = with @data[name]
             .current_level = current_level
@@ -91,7 +91,7 @@ T.xp_manager =
         for i = 1, num
             unit = 'party' .. i
             name, realm = UnitName unit
-            name = misc.fix_name name, realm
+            name = fix_name name, realm
             group[name] = true
 
         for k, _ in pairs @data
@@ -100,14 +100,9 @@ T.xp_manager =
                 @data[k] = nil
                 em\fire 'SHAREXP_XP_UPDATED'
 
-is_any_nil = (...) ->
-    for item in *{...}
-        if type(item) == 'nil' then return true
-    false
-
 xp = T.xp_manager
 
-comm\add 'xpupdate', (channel, sender, ...) ->
+comm\register_callback 'xpupdate', (kind, channel, sender, ...) ->
     -- ARGS:
     -- 1: current level
     -- 2: max level
@@ -116,22 +111,22 @@ comm\add 'xpupdate', (channel, sender, ...) ->
     log\debug L.xp_received_update, channel, sender
     xp\update sender, ...
 
-comm\add 'xprequest', (channel, sender) ->
+comm\register_callback 'xprequest', (kind, channel, sender) ->
     log\debug L.xp_received_request, channel, sender
     xp\send_xp!
 
-T.PLAYER_ENTERING_WORLD = =>
+T.PLAYER_ENTERING_WORLD = ->
     xp\send_xp!
     xp\request_xp! if IsInGroup!
 
-T.PLAYER_XP_UPDATE = =>
+T.PLAYER_XP_UPDATE = ->
     xp\send_xp!
 
-T.GROUP_ROSTER_UPDATE = =>
+T.GROUP_ROSTER_UPDATE = ->
     xp\send_xp!
     xp\check_group!
 
-T.SHAREXP_LOADED = =>
+T.SHAREXP_LOADED = ->
     expansion_level = GetExpansionLevel!
     max_lvl = xp.max_levels[expansion_level]
     xp.max_level = max_lvl

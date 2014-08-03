@@ -36,68 +36,68 @@ local comm, log, misc
 
 {localization: L} = T
 
-T.comm_manager =
-    prefix: NAME\upper!
-    handlers: {}
+T.comm_manager = do
+    class CommManager extends T.CallbackManager
+        prefix = NAME\upper!
 
-    handle: (message, channel, sender) =>
-        return unless message
-        message = message\trim!
-        return if message == ''
-        di = message\find DELIMITER
-        kind = di and message\sub 1, di - 1 or message
-        kind = kind\lower!
+        handle: (message, channel, sender) =>
+            return unless message
+            message = message\trim!
+            return if message == ''
+            di = message\find DELIMITER
+            kind = di and message\sub 1, di - 1 or message
+            kind = kind\lower!
 
-        return unless @handlers[kind]
+            return unless @handlers[kind]
 
-        args = {}
-        if di
-            arg = message\sub di + 1
-            for token in arg\gmatch DELIMITER_MATCH
-                args[#args + 1] = token
+            args = {}
+            if di
+                arg = message\sub di + 1
+                for token in arg\gmatch DELIMITER_MATCH
+                    args[#args + 1] = token
 
-        for _, handler in pairs @handlers[kind]
-            handler channel, sender, unpack args
+            @fire kind, channel, sender, unpack args
 
-    send: (channel, target, kind, ...) =>
-        if channel != 'WHISPER' and channel != 'CHANNEL' and target
-            return @send channel, nil, target, kind, ...
+        send: (channel, target, kind, ...) =>
+            if channel != 'WHISPER' and channel != 'CHANNEL' and target
+                return @send channel, nil, target, kind, ...
 
-        message = kind
-        for v in *{...}
-            message ..= DELIMITER .. v
+            message = kind
+            for v in *{...}
+                message ..= DELIMITER .. v
 
-        if message\len! > MAX_MESSAGE_LENGTH
-            log\warn L.comm_message_length, kind, MAX_MESSAGE_LENGTH
+            if message\len! > MAX_MESSAGE_LENGTH
+                log\warn L.comm_message_length, kind, MAX_MESSAGE_LENGTH
 
-        SendAddonMessage @prefix, message, channel, target
+            SendAddonMessage @prefix, message, channel, target
 
-    add: (kind, handler) =>
-        kind = kind\lower!
-        @handlers[kind] = {} unless @handlers[kind]
-        @handlers[kind][#@handlers[kind] + 1] = handler
+        register_callback: (kind, handler) =>
+            kind = kind\lower!
+            super kind, handler
 
-    remove: (kind, handler) =>
-        kind = kind\lower!
-        return unless @handlers[kind]
-        for i = #@handlers[kind], 1, -1
-            h = @handlers[kind][i]
-            @handlers[kind][i] = nil if h == handler
+        unregister_callback: (kind, handler) =>
+            kind = kind\lower!
+            super kind, handler
 
-    remove_all: (kind) =>
-        kind = kind\lower!
-        return unless @handlers[kind]
-        wipe @handlers[kind]
+        unregister_callbacks: (kind) =>
+            kind = kind\lower!
+            super kind
+
+        unregister_all_callbacks: (kind) =>
+            kind = kind\lower!
+            super kind
+
+    CommManager!
 
 {comm_manager: comm, :log, :misc} = T
 
-T.CHAT_MSG_ADDON = (prefix, message, channel, sender) =>
+T.CHAT_MSG_ADDON = (prefix, message, channel, sender) ->
     return if prefix != comm.prefix or channel != 'PARTY'
     fixed_sender = misc.fix_name sender
     player = misc.fix_name UnitName 'player'
     return if fixed_sender == player
     comm\handle message, channel, sender
 
-T.SHAREXP_LOADED = =>
+T.SHAREXP_LOADED = ->
     RegisterAddonMessagePrefix comm.prefix
     log\debug L.comm_prefix_registered, comm.prefix

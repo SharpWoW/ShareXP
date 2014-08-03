@@ -16,6 +16,7 @@ lua\utils.lua
 load_locales.xml
 
 lua\init.lua
+lua\callback_manager.lua
 lua\events.lua
 lua\log.lua
 lua\db.lua

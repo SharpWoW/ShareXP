@@ -84,3 +84,8 @@ T.misc =
         return false, err unless type(func) == 'function'
         setfenv func, {} -- Don't give access to anything
         pcall func
+
+    is_any_nil: (...) ->
+        for item in *{...}
+            return true if type(item) == 'nil'
+        false

@@ -28,44 +28,24 @@ EVENT_NAME_PATTERN = '^[A-Z_]+$'
 
 import frame from T
 
-local wipe
-wipe = wipe or (tbl) -> for k, _ in pairs tbl do tbl[k] = nil
+T.event_manager = do
+    class EventManager extends T.CallbackManager
+        handle: (frame, event, ...) =>
+            @fire event, ...
 
-T.event_manager =
-    events: {}
+        get_handlers: (event) =>
+            if @handlers[event] then [h for h in *@handlers[event]] else nil
 
-    handle: (frame, event, ...) =>
-        return unless @events[event]
-        for _, handler in pairs @events[event] do handler(T, ...)
+        callback_initialized: (event) =>
+            frame\RegisterEvent event unless frame\IsEventRegistered event
 
-    add: (event, handler) =>
-        @events[event] = {} unless @events[event]
-        @events[event][#@events[event] + 1] = handler
-        frame\RegisterEvent event unless frame\IsEventRegistered event
-
-    remove: (event, handler) =>
-        return unless @events[event]
-
-        for k, h in pairs @events[event]
-            @events[event] = nil if h == handler
-
-        if #@events[event] == 0 and frame\IsEventRegistered event
-            frame\UnregisterEvent event
-
-    remove_all: (event) =>
-        if event
-            wipe @events
-            frame\UnregisterAllEvents!
-        else
-            return unless @events[event]
-            wipe @events[event]
+        callback_cleared: (event) =>
             frame\UnregisterEvent event if frame\IsEventRegistered event
 
-    get_handlers: (event) =>
-        if @events[event] then [h for h in *@events[event]] else nil
+        callbacks_cleared: =>
+            frame\UnregisterAllEvents!
 
-    fire: (event, ...) =>
-        @handle nil, event, ...
+    EventManager!
 
 em = T.event_manager
 
@@ -80,7 +60,10 @@ mt =
 
     __newindex: (tbl, key, value) ->
         if key\match EVENT_NAME_PATTERN
-            em\add key, value
+            if value == nil
+                em\unregister_callbacks key
+            else
+                em\register_callback key, value
         else
             rawset tbl, key, value
 
