@@ -24,18 +24,20 @@ NAME, T = ...
 
 {:IsControlKeyDown, :IsShiftKeyDown, :LibStub} = _G
 
-ldb = LibStub\GetLibrary "LibDataBroker-1.1"
+ldb = LibStub\GetLibrary 'LibDataBroker-1.1'
 
 data =
     type: 'data source'
     label: NAME
     icon: "Interface\\AddOns\\#{NAME}\\icon.tga"
     tocname: NAME
-    text: NAME .. ': Allan add something here'
+    text: L.b_text_empty
 
 click_handlers =
     none:
         LeftButton: -> log\error 'Allan please add xp sharing to chat'
+
+tooltip_visible = false
 
 obj = ldb\NewDataObject "Broker_#{NAME}", data
 
@@ -59,15 +61,21 @@ obj.OnClick = (button) =>
     func = click_handlers[mod][button]
     func! if func
 
+update = ->
+    GameTooltip\ClearLines!
+    obj.OnTooltipShow GameTooltip
+    GameTooltip\Show!
+    tooltip_visible = true
+
 obj.OnEnter = =>
     GameTooltip\SetOwner @, 'ANCHOR_NONE'
     GameTooltip\SetPoint 'TOPLEFT', @, 'BOTTOMLEFT'
-    GameTooltip\ClearLines!
-    @.OnTooltipShow GameTooltip
-    GameTooltip\Show!
+    update!
 
 obj.OnLeave = =>
     GameTooltip\Hide!
+    tooltip_visible = false
 
 T.SHAREXP_XP_UPDATED = =>
-    obj.text = 'Allan please add updating text'
+    obj.text = "#{NAME}: Allan please add updating text"
+    update! if tooltip_visible

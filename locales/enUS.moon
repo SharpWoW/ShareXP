@@ -32,6 +32,7 @@ L =
     debug_status: 'Debugging %s!'
 
     -- Broker
+    b_text_empty: "#{NAME}: No data"
     b_announce_smart: 'Announce XP (Smart)'
     b_header_xp: 'XP data for party'
     b_header_empty: 'No data at the moment'
