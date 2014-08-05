@@ -5,6 +5,8 @@
 *.lua
 # But allow the lint config
 !/lint_config.lua
+# Also allow libraries
+!/libs/**/*.lua
 
 # Ignore build directories
 /build
