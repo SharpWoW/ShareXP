@@ -147,6 +147,10 @@ register 'l', (arg, section, s_arg, ss_arg) ->
             return log\error L.log_invalid_prefix unless prefix
             db\set 'log.color.level.' .. prefix, ss_arg
 
+register 'minimap', ->
+    T.broker\toggle_minimap!
+    log\notice L.b_minimap_status, T.broker\is_minimap_enabled! and L.enabled or L.disabled
+
 for i, v in ipairs {'sharexp', 'sxp'}
     _G['SLASH_' .. NAME\upper! .. i] = '/' .. v
 

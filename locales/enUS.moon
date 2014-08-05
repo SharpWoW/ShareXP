@@ -36,6 +36,7 @@ L =
     b_announce_smart: 'Announce XP (Smart)'
     b_header_xp: 'XP data for party'
     b_header_empty: 'No data at the moment'
+    b_minimap_status: 'Minimap icon is now %s.'
 
     -- Comm module
     comm_message_length: 'comm_manager\\send: (%s) message length > %d'

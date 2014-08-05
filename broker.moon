@@ -20,11 +20,12 @@
 
 NAME, T = ...
 
-{localization: L, :log, :number, xp_manager: xp} = T
+{database: db, localization: L, :log, :number, xp_manager: xp} = T
 
 {:IsControlKeyDown, :IsShiftKeyDown, :LibStub} = _G
 
 ldb = LibStub\GetLibrary 'LibDataBroker-1.1'
+icon = LibStub\GetLibrary 'LibDBIcon-1.0'
 
 data =
     type: 'data source'
@@ -76,6 +77,26 @@ obj.OnLeave = =>
     GameTooltip\Hide!
     tooltip_visible = false
 
+icon_settings_table = setmetatable {},
+    __index: (key) =>
+        db "broker.icon.#{key}"
+    __newindex: (key, value) =>
+        db\set "broker.icon.#{key}", value
+
+icon\register NAME, obj, icon_settings_table
+
 T.SHAREXP_XP_UPDATED = ->
     obj.text = "#{NAME}: Allan please add updating text"
     update! if tooltip_visible
+
+T.broker =
+    set_minimap: (enabled) =>
+        -- Invert `enabled` since we're setting the 'hide' key
+        db\set 'broker.icon.hide', not enabled
+        if enabled then icon\show NAME else icon\hide NAME
+
+    toggle_minimap: =>
+        @set_icon not db 'broker.icon.hide'
+
+    is_minimap_enabled: =>
+        db 'broker.icon.hide'
