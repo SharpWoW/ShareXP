@@ -20,4 +20,6 @@
 
 NAME, T = ...
 
+export ShareXP = T
+
 T.frame = CreateFrame 'Frame'

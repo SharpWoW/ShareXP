@@ -83,7 +83,9 @@ icon_settings_table = setmetatable {},
     __newindex: (key, value) =>
         db\set "broker.icon.#{key}", value
 
-icon\register NAME, obj, icon_settings_table
+T.SHAREXP_DB_LOADED = (event, database) ->
+    return unless database.global_name == db.global_name
+    icon\Register NAME, obj, icon_settings_table
 
 T.SHAREXP_XP_UPDATED = ->
     obj.text = "#{NAME}: Allan please add updating text"

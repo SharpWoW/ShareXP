@@ -38,7 +38,9 @@ local comm, log, misc
 
 T.comm_manager = do
     class CommManager extends T.CallbackManager
-        prefix = NAME\upper!
+        new: =>
+            super!
+            @prefix = NAME\upper!
 
         handle: (message, channel, sender) =>
             return unless message
@@ -69,7 +71,7 @@ T.comm_manager = do
             if message\len! > MAX_MESSAGE_LENGTH
                 log\warn L.comm_message_length, kind, MAX_MESSAGE_LENGTH
 
-            SendAddonMessage prefix, message, channel, target
+            SendAddonMessage @prefix, message, channel, target
 
         register_callback: (kind, handler) =>
             kind = kind\lower!
