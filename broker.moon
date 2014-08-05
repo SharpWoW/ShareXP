@@ -98,10 +98,10 @@ T.broker =
     set_minimap: (enabled) =>
         -- Invert `enabled` since we're setting the 'hide' key
         db\set 'broker.minimap.hide', not enabled
-        if enabled then icon\show NAME else icon\hide NAME
+        if enabled then icon\Show NAME else icon\Hide NAME
 
     toggle_minimap: =>
         @set_minimap db 'broker.minimap.hide'
 
     is_minimap_enabled: =>
-        db 'broker.minimap.hide'
+        not db 'broker.minimap.hide'
