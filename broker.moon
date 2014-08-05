@@ -79,12 +79,15 @@ obj.OnLeave = =>
 
 icon_settings_table = setmetatable {},
     __index: (key) =>
-        db "broker.icon.#{key}"
+        db "broker.minimap.#{key}"
     __newindex: (key, value) =>
-        db\set "broker.icon.#{key}", value
+        db\set "broker.minimap.#{key}", value
 
 T.SHAREXP_DB_LOADED = (event, database) ->
     return unless database.global_name == db.global_name
+    -- Set minimap icon defaults
+    db 'broker.minimap.lock', false
+    db 'broker.minimap.hide', true
     icon\Register NAME, obj, icon_settings_table
 
 T.SHAREXP_XP_UPDATED = ->
@@ -94,11 +97,11 @@ T.SHAREXP_XP_UPDATED = ->
 T.broker =
     set_minimap: (enabled) =>
         -- Invert `enabled` since we're setting the 'hide' key
-        db\set 'broker.icon.hide', not enabled
+        db\set 'broker.minimap.hide', not enabled
         if enabled then icon\show NAME else icon\hide NAME
 
     toggle_minimap: =>
-        @set_icon not db 'broker.icon.hide'
+        @set_minimap db 'broker.minimap.hide'
 
     is_minimap_enabled: =>
-        db 'broker.icon.hide'
+        db 'broker.minimap.hide'
