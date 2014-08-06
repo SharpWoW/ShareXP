@@ -114,7 +114,7 @@ register 'l', (arg, section, s_arg, ss_arg) ->
         level = tonumber level
         if not level -- Attempt to parse a text value
             prefix = s_arg\match('^.')\upper!
-            for pre, lvl in Logger.levels
+            for pre, lvl in pairs Logger.levels
                 if prefix == pre\match '^%w'
                     level = lvl
                     break
