@@ -33,6 +33,7 @@ NAME, T = ...
     :GetExpansionLevel, :GetRealmName, :GetNumSubgroupMembers
     :IsInGroup
     :LE_PARTY_CATEGORY_HOME
+    :next
     :UnitLevel, :UnitName, :UnitXP, :UnitXPMax
 } = _G
 
@@ -48,7 +49,7 @@ T.xp_manager =
     data: {}
 
     has_data: =>
-        #@data > 0
+        next(@data) != nil
 
     update: (name, current_level, max_level, current_xp, max_xp) =>
         name = fix_name name
