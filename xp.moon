@@ -97,7 +97,7 @@ T.xp_manager =
 
         for k, _ in pairs @data
             unless group[k]
-                log\debug L.xp.removing, k
+                log\debug L.xp_removing, k
                 @data[k] = nil
                 em\fire 'SHAREXP_XP_UPDATED'
 
