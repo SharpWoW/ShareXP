@@ -46,7 +46,7 @@ obj.OnTooltipShow = =>
     if xp\has_data!
         @AddLine L.b_header_xp
         @AddLine ' ' -- Separator
-        for name, data in xp.data
+        for name, data in pairs xp.data
             with data
                 left = '%s [%d]'\format .friendly_name, .current_level
                 right = '%s/%s'\format number.format(.current_xp), number.format(.max_xp)
