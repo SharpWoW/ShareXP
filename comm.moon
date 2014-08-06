@@ -93,7 +93,7 @@ T.comm_manager = do
 
 {comm_manager: comm, :log, :misc} = T
 
-T.CHAT_MSG_ADDON = (prefix, message, channel, sender) ->
+T.CHAT_MSG_ADDON = (event, prefix, message, channel, sender) ->
     return if prefix != comm.prefix or channel != 'PARTY'
     fixed_sender = misc.fix_name sender
     player = misc.fix_name UnitName 'player'
