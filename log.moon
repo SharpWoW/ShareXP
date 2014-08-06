@@ -55,6 +55,8 @@ class T.Logger
     log: (level, ...) =>
         return unless logging_enabled -- db 'log', true
         return if level == @@levels.DEBUG and (not db_loaded or not debug_enabled)
+        -- Override the logging level if global debug option is enabled
+        level = @@levels.DEBUG if debug_enabled
         return if level < logging_level
         prefix = @@level_to_prefix level
         docolor = logging_color_enabled
