@@ -47,7 +47,7 @@ T.comm_manager = do
             message = message\trim!
             return if message == ''
             di = message\find DELIMITER
-            kind = di and message\sub 1, di - 1 or message
+            kind = di and message\sub(1, di - 1) or message
             kind = kind\lower!
 
             return unless @handlers[kind]
