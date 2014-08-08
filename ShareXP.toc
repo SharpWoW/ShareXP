@@ -20,6 +20,8 @@ lua\log.lua
 lua\db.lua
 lua\comm.lua
 lua\main.lua
+lua\chat.lua
 lua\commands.lua
 lua\xp.lua
 lua\broker.lua
+lua\options.lua

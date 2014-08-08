@@ -38,6 +38,9 @@ L =
     b_header_empty: 'No data at the moment'
     b_minimap_status: 'Minimap icon is now %s.'
 
+    -- Chat messages
+    chat_xp_report: "[#{NAME}] Level %d, %s/%s EXP (%d%%)"
+
     -- Comm module
     comm_message_length: 'comm_manager\\send: (%s) message length > %d'
     comm_prefix_registered: 'Registered addon message prefix: %s'
@@ -67,6 +70,13 @@ L =
     log_color_usage: 'Usage: enable/disable / name/<level> <color>'
     log_invalid_prefix: 'Invalid prefix'
     
+    -- Options panel
+    opt_minimap: 'Minimap icon'
+    opt_minimap_desc: "Shows the #{NAME} icon around your minimap"
+    opt_debug: 'Enable debug mode'
+    opt_debug_desc: 'Enables AddOn debug mode, can produce a lot of spam'
+    opt_loglevel: 'Log level: %s'
+
     -- XP
     xp_invalid_data: 'Invalid data received from %s'
     xp_updated: 'XP updated for %s'

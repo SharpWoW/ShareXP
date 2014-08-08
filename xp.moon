@@ -51,6 +51,17 @@ T.xp_manager =
     has_data: =>
         next(@data) != nil
 
+    get_self: =>
+        current_xp = UnitXP 'player'
+        max_xp = UnitXPMax 'player'
+        {
+            level: UnitLevel 'player'
+            max_level: @max_level
+            :current_xp
+            :max_xp
+            percentage: math.floor (current_xp / max_xp) * 100 + 0.5
+        }
+
     update: (name, current_level, max_level, current_xp, max_xp) =>
         name = fix_name name
         current_level = tonumber current_level
@@ -72,6 +83,7 @@ T.xp_manager =
             .max_level = max_level
             .current_xp = current_xp
             .max_xp = max_xp
+            .percentage = math.floor (current_xp / max_xp) * 100 + 0.5
         em\fire 'SHAREXP_XP_UPDATED'
         log\debug L.xp_updated, data.friendly_name
 

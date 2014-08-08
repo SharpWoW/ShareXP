@@ -55,8 +55,9 @@ class T.Logger
     log: (level, ...) =>
         return unless logging_enabled -- db 'log', true
         return if level == @@levels.DEBUG and (not db_loaded or not debug_enabled)
+        -- TODO: Review why the fuck the below was there
         -- Override the logging level if global debug option is enabled
-        level = @@levels.DEBUG if debug_enabled
+        --level = @@levels.DEBUG if debug_enabled
         return if level < logging_level
         prefix = @@level_to_prefix level
         docolor = logging_color_enabled
@@ -107,8 +108,9 @@ T.SHAREXP_DB_LOADED = (event, database) ->
 
 T.SHAREXP_DB_UPDATED = (event, db, key) ->
     return unless db.global_name == 'ShareXPDB'
-    return unless key\match '^log'
     switch key
+        when 'debug'
+            debug_enabled = db 'debug'
         when 'log'
             value = db 'log'
             logging_enabled = value

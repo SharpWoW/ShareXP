@@ -36,7 +36,13 @@ data =
 
 click_handlers =
     none:
-        LeftButton: -> log\error 'Allan please add xp sharing to chat'
+        LeftButton: ->
+            data = xp\get_self!
+            T.chat\send L 'chat_xp_report',
+                    data.level,
+                    number.format data.current_xp,
+                    number.format data.max_xp,
+                    data.percentage
 
 tooltip_visible = false
 
@@ -49,7 +55,7 @@ obj.OnTooltipShow = =>
         for name, data in pairs xp.data
             with data
                 left = '%s [%d]'\format .friendly_name, .current_level
-                right = '%s/%s'\format number.format(.current_xp), number.format(.max_xp)
+                right = '%s/%s (%d%%)'\format number.format(.current_xp), number.format(.max_xp), .percentage
                 @AddDoubleLine left, right, 1, 1, 1, 1, 1, 1
     else
         @AddLine L.b_header_empty
