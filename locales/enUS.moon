@@ -73,9 +73,15 @@ L =
     -- Options panel
     opt_minimap: 'Minimap icon'
     opt_minimap_desc: "Shows the #{NAME} icon around your minimap"
+    opt_logging: 'Enable logging'
+    opt_logging_desc: "Note that turning off logging will disable ALL output from #{NAME}"
     opt_debug: 'Enable debug mode'
     opt_debug_desc: 'Enables AddOn debug mode, can produce a lot of spam'
     opt_loglevel: 'Log level: %s'
+    opt_request: 'Request XP'
+    opt_request_desc: 'Requests an XP update from party members'
+    opt_send: 'Send XP'
+    opt_send_desc: 'Sends your XP data to party members'
 
     -- XP
     xp_invalid_data: 'Invalid data received from %s'

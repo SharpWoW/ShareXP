@@ -20,7 +20,7 @@
 
 NAME, T = ...
 
-{database: db, localization: L, :Logger} = T
+{database: db, localization: L, :Logger, xp_manager: xp} = T
 
 local panel
 
@@ -33,6 +33,14 @@ checkbox = (label, description, on_click) ->
             \SetText label
         .tooltipText = label
         .tooltipRequirement = description
+
+button = (text, tooltip, on_click) ->
+    with CreateFrame 'Button', nil, panel, 'UIPanelButtonTemplate'
+        \SetText text
+        .tooltipText = tooltip
+        \SetScript 'OnClick', =>
+            on_click @
+        \SetHeight 24
 
 panel = with CreateFrame 'Frame'
     .name = NAME
@@ -47,9 +55,14 @@ panel = with CreateFrame 'Frame'
         minimap\SetPoint 'TOPLEFT', title, 'BOTTOMLEFT', -2, -16
         minimap\SetChecked T.broker\is_minimap_enabled!
 
+        logging = checkbox L.opt_logging, L.opt_logging_desc, (checked) =>
+            db\set 'log', checked
+        logging\SetPoint 'TOPLEFT', minimap, 'BOTTOMLEFT', 0, -8
+        logging\SetChecked db('log', true)
+
         debug = checkbox L.opt_debug, L.opt_debug_desc, (checked) =>
             T\set_debug checked
-        debug\SetPoint 'TOPLEFT', minimap, 'BOTTOMLEFT', 0, -8
+        debug\SetPoint 'TOPLEFT', logging, 'BOTTOMLEFT', 0, -8
         debug\SetChecked T\is_debug_enabled!
 
         loglevel_dropdown = with CreateFrame 'Frame', "#{NAME}LogLevels", @, 'UIDropDownMenuTemplate'
@@ -66,8 +79,17 @@ panel = with CreateFrame 'Frame'
             .text = _G["#{\GetName!}Text"]
             .text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.INFO)))
 
+        request = with button L.opt_request, L.op_request_desc, => xp\request_xp!
+            \SetWidth 150
+            \SetPoint 'TOPLEFT', loglevel_dropdown, 'BOTTOMLEFT', 17, -25
+
+        send = with button L.opt_send, L.opt_send_desc, => xp\send_xp!
+            \SetWidth 150
+            \SetPoint 'TOPLEFT', request, 'TOPRIGHT', 8, 0
+
         @SetScript 'OnShow', =>
             minimap\SetChecked T.broker\is_minimap_enabled!
+            logging\SetChecked db('log', true)
             debug\SetChecked T\is_debug_enabled!
             loglevel_dropdown.text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.info)))
 
