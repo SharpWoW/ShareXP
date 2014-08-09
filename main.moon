@@ -39,6 +39,9 @@ T.ADDON_LOADED = (event, name) ->
 T.set_debug = (enabled) =>
     db\set 'debug', enabled
 
+T.reset_debug = =>
+    db\reset 'debug'
+
 T.toggle_debug = =>
     @set_debug not @is_debug_enabled!
 

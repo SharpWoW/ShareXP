@@ -106,6 +106,10 @@ T.broker =
         db\set 'broker.minimap.hide', not enabled
         if enabled then icon\Show NAME else icon\Hide NAME
 
+    reset_minimap: =>
+        db\reset 'broker.minimap.hide'
+        if db 'broker.minimap.hide' then icon\Show NAME else icon\Hide NAME
+
     toggle_minimap: =>
         @set_minimap db 'broker.minimap.hide'
 

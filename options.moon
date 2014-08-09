@@ -53,17 +53,16 @@ panel = with CreateFrame 'Frame'
         minimap = checkbox L.opt_minimap, L.opt_minimap_desc, (checked) =>
             T.broker\set_minimap checked
         minimap\SetPoint 'TOPLEFT', title, 'BOTTOMLEFT', -2, -16
-        minimap\SetChecked T.broker\is_minimap_enabled!
 
         logging = checkbox L.opt_logging, L.opt_logging_desc, (checked) =>
             db\set 'log', checked
         logging\SetPoint 'TOPLEFT', minimap, 'BOTTOMLEFT', 0, -8
-        logging\SetChecked db('log', true)
 
         debug = checkbox L.opt_debug, L.opt_debug_desc, (checked) =>
             T\set_debug checked
         debug\SetPoint 'TOPLEFT', logging, 'BOTTOMLEFT', 0, -8
-        debug\SetChecked T\is_debug_enabled!
+
+        local update_lld
 
         loglevel_dropdown = with CreateFrame 'Frame', "#{NAME}LogLevels", @, 'UIDropDownMenuTemplate'
             \SetPoint 'TOPLEFT', debug, 'BOTTOMLEFT', -15, -10
@@ -74,10 +73,12 @@ panel = with CreateFrame 'Frame'
                         value: value
                         func: =>
                             db\set 'log.level', @value
-                            .text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.INFO)))
+                            update_lld! if update_lld
                         checked: value == db 'log.level', Logger.levels.INFO
             .text = _G["#{\GetName!}Text"]
-            .text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.INFO)))
+
+        update_lld = ->
+            loglevel_dropdown.text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.info)))
 
         request = with button L.opt_request, L.op_request_desc, => xp\request_xp!
             \SetWidth 150
@@ -87,10 +88,25 @@ panel = with CreateFrame 'Frame'
             \SetWidth 150
             \SetPoint 'TOPLEFT', request, 'TOPRIGHT', 8, 0
 
-        @SetScript 'OnShow', =>
+        init = ->
             minimap\SetChecked T.broker\is_minimap_enabled!
             logging\SetChecked db('log', true)
             debug\SetChecked T\is_debug_enabled!
-            loglevel_dropdown.text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.info)))
+            update_lld!
+
+        reset = ->
+            T.broker\reset_minimap!
+            db\reset 'log'
+            T\reset_debug!
+            db\reset 'log.level'
+            init!
+
+        init!
+
+        @default = ->
+            reset!
+
+        @SetScript 'OnShow', =>
+            init!
 
 InterfaceOptions_AddCategory panel
