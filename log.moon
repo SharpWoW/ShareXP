@@ -54,11 +54,8 @@ class T.Logger
 
     log: (level, ...) =>
         return unless logging_enabled -- db 'log', true
-        return if level == @@levels.DEBUG and (not db_loaded or not debug_enabled)
-        -- TODO: Review why the fuck the below was there
-        -- Override the logging level if global debug option is enabled
-        --level = @@levels.DEBUG if debug_enabled
-        return if level < logging_level
+        return if level == @@levels.DEBUG and not debug_enabled
+        return if level < logging_level and not debug_enabled
         prefix = @@level_to_prefix level
         docolor = logging_color_enabled
         name = docolor and decorate(NAME, @@colors.name) or NAME
