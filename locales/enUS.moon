@@ -59,6 +59,9 @@ L =
     db_set_load: 'set called before load, queueing set action on %s'
     db_reset_load: 'reset called before load, queueing reset action on %s'
 
+    -- Debug
+    debug_exported: "Private AddOn table exported to _G['#{NAME}']"
+
     -- Log
     log_status: 'Logging is %s.'
     log_status_changed: 'Logging %s.'

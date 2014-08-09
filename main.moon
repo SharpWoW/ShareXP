@@ -29,15 +29,20 @@ assert type(T.event_manager) == 'table', L 'loaderror', 'main.moon', 'events.moo
 T.ADDON_LOADED = (event, name) ->
     return if name != NAME
     db\load!
-    db 'debug', false
 
-    -- DEBUG:
-    _G[NAME] = T
+    if db 'debug', false
+        _G[NAME] = T
+        T.log\debug L.debug_exported
 
     em\fire NAME\upper! .. '_LOADED'
 
 T.set_debug = (enabled) =>
     db\set 'debug', enabled
+    if enabled
+        _G[NAME] = T
+        T.log\debug L.debug_exported
+    else
+        _G[NAME] = nil
 
 T.reset_debug = =>
     db\reset 'debug'
