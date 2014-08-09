@@ -22,11 +22,9 @@ NAME, T = ...
 
 L = T.localization
 
-assert type(T.frame) == 'table', L 'loaderror', 'events.moon', 'init.moon'
-
 EVENT_NAME_PATTERN = '^[A-Z_]+$'
 
-import frame from T
+frame = CreateFrame 'Frame'
 
 T.event_manager = do
     class EventManager extends T.CallbackManager
