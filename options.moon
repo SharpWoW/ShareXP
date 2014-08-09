@@ -80,7 +80,7 @@ panel = with CreateFrame 'Frame'
         update_lld = ->
             loglevel_dropdown.text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.info)))
 
-        request = with button L.opt_request, L.op_request_desc, => xp\request_xp!
+        request = with button L.opt_request, L.opt_request_desc, => xp\request_xp!
             \SetWidth 150
             \SetPoint 'TOPLEFT', loglevel_dropdown, 'BOTTOMLEFT', 17, -25
 
