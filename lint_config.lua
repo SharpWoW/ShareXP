@@ -10,7 +10,7 @@ return {
         ["commands.moon"] = {
             "SlashCmdList"
         },
-        ["init.moon"] = {
+        ["events.moon"] = {
             "CreateFrame"
         },
         ["log.moon"] = {
