@@ -47,7 +47,7 @@ T.event_manager = do
 
 em = T.event_manager
 
-frame\SetScript 'OnEvent', (f, e, ...) -> em\handle f, e, ...
+frame\SetScript 'OnEvent', em\handle
 
 mt =
     __index: (tbl, key) ->
