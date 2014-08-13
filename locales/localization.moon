@@ -20,35 +20,25 @@
 
 NAME, T = ...
 
-L = T.localization
+class LocaleString
+    new: (@value) =>
+    
+    __tostring: =>
+        @value
+    
+    __call: (...) =>
+        @value\format ...
 
-assert type(T.event_manager) == 'table', L.loaderror 'main.moon', 'events.moon'
+locale_strings = {}
 
-{database: db, event_manager: em} = T
+T.localization = setmetatable {},
+    __index: (key) =>
+        locale_string = locale_strings[key]
+        locale_string if locale_string else "L.#{key}"
 
-T.ADDON_LOADED = (event, name) ->
-    return if name != NAME
-    db\load!
+    __newindex: (key, value) =>
+        rawset locales, key, LocaleString value
 
-    if db 'debug', false
-        _G[NAME] = T
-        T.log\debug L.debug_exported
-
-    em\fire NAME\upper! .. '_LOADED'
-
-T.set_debug = (enabled) =>
-    db\set 'debug', enabled
-    if enabled
-        _G[NAME] = T
-        T.log\debug L.debug_exported
-    else
-        _G[NAME] = nil
-
-T.reset_debug = =>
-    db\reset 'debug'
-
-T.toggle_debug = =>
-    @set_debug not @is_debug_enabled!
-
-T.is_debug_enabled = =>
-    db 'debug', false
+    -- Backwards compatibility
+    __call: (key, ...) =>
+        @[key]\format ...

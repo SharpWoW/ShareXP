@@ -123,7 +123,7 @@ T.SHAREXP_DB_UPDATED = (event, db, key) ->
         when 'log.color.name'
             color = db 'log.color.name'
             Logger.colors.name = color
-            msg = L 'log_color_changed', L.name\gsub('^.', upper), color
+            msg = L.log_color_changed L.name\gsub('^.', upper), color
             log\notice decorate(msg, color)
         else
             prefix = key\match '^log%.color%.level%.(%w+)$'
@@ -132,5 +132,5 @@ T.SHAREXP_DB_UPDATED = (event, db, key) ->
                 level = Logger\prefix_to_level prefix
                 color = db key
                 Logger.colors.levels[level] = color
-                msg = L 'log_color_changed', prefix, color
+                msg = L.log_color_changed prefix, color
                 log\notice decorate(msg, color)

@@ -78,7 +78,7 @@ panel = with CreateFrame 'Frame'
             .text = _G["#{\GetName!}Text"]
 
         update_lld = ->
-            loglevel_dropdown.text\SetText L('opt_loglevel', Logger\level_to_prefix(db('log.level', Logger.levels.info)))
+            loglevel_dropdown.text\SetText L.opt_loglevel Logger\level_to_prefix db('log.level', Logger.levels.info)
 
         request = with button L.opt_request, L.opt_request_desc, => xp\request_xp!
             \SetWidth 150

@@ -38,11 +38,10 @@ click_handlers =
     none:
         LeftButton: ->
             data = xp\get_self!
-            T.chat\send L 'chat_xp_report',
-                    data.level,
-                    number.format data.current_xp,
-                    number.format data.max_xp,
-                    data.percentage
+            current_xp = number.format data.current_xp
+            max_xp = number.format data.max_xp
+            T.chat\send L.chat_xp_report data.level,
+                    current_xp, max_xp, data.percentage
 
 tooltip_visible = false
 
