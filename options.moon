@@ -50,11 +50,11 @@ panel = with CreateFrame 'Frame'
             \SetPoint 'TOPLEFT', 16, -16
             \SetText NAME
 
-        minimap = checkbox L.opt_minimap, L.opt_minimap_desc, (checked) =>
+        minimap = checkbox L.opt_minimap!, L.opt_minimap_desc!, (checked) =>
             T.broker\set_minimap checked!
         minimap\SetPoint 'TOPLEFT', title, 'BOTTOMLEFT', -2, -16
 
-        logging = checkbox L.opt_logging, L.opt_logging_desc!, (checked) =>
+        logging = checkbox L.opt_logging!, L.opt_logging_desc!, (checked) =>
             db\set 'log', checked
         logging\SetPoint 'TOPLEFT', minimap, 'BOTTOMLEFT', 0, -8
 
