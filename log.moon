@@ -62,7 +62,14 @@ class T.Logger
         logname = (docolor and @color) and decorate(@name, @color) or @name
         prefix_color = docolor and @@colors.levels[level] or nil
         prefix = (docolor and prefix_color) and decorate(prefix, prefix_color) or prefix
-        msg = '%s.%s: [%s] %s'\format name, logname, prefix, format ...
+
+        -- Tostring any LocaleStrings
+        args = {...}
+        for i = 1, #args
+            arg = args[i]
+            args[i] = tostring(arg) if type(arg) == 'table' and type(arg.__class) == 'table' and arg.__class.__name == 'LocaleString'
+
+        msg = '%s.%s: [%s] %s'\format name, logname, prefix, format unpack args
         DEFAULT_CHAT_FRAME\AddMessage msg
 
 import Logger from T

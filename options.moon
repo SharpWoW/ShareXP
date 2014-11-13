@@ -51,14 +51,14 @@ panel = with CreateFrame 'Frame'
             \SetText NAME
 
         minimap = checkbox L.opt_minimap, L.opt_minimap_desc, (checked) =>
-            T.broker\set_minimap checked
+            T.broker\set_minimap checked!
         minimap\SetPoint 'TOPLEFT', title, 'BOTTOMLEFT', -2, -16
 
-        logging = checkbox L.opt_logging, L.opt_logging_desc, (checked) =>
+        logging = checkbox L.opt_logging, L.opt_logging_desc!, (checked) =>
             db\set 'log', checked
         logging\SetPoint 'TOPLEFT', minimap, 'BOTTOMLEFT', 0, -8
 
-        debug = checkbox L.opt_debug, L.opt_debug_desc, (checked) =>
+        debug = checkbox L.opt_debug!, L.opt_debug_desc!, (checked) =>
             T\set_debug checked
         debug\SetPoint 'TOPLEFT', logging, 'BOTTOMLEFT', 0, -8
 
@@ -80,11 +80,11 @@ panel = with CreateFrame 'Frame'
         update_lld = ->
             loglevel_dropdown.text\SetText L.opt_loglevel Logger\level_to_prefix db('log.level', Logger.levels.info)
 
-        request = with button L.opt_request, L.opt_request_desc, => xp\request_xp!
+        request = with button L.opt_request!, L.opt_request_desc!, => xp\request_xp!
             \SetWidth 150
             \SetPoint 'TOPLEFT', loglevel_dropdown, 'BOTTOMLEFT', 17, -25
 
-        send = with button L.opt_send, L.opt_send_desc, => xp\send_xp!
+        send = with button L.opt_send!, L.opt_send_desc!, => xp\send_xp!
             \SetWidth 150
             \SetPoint 'TOPLEFT', request, 'TOPRIGHT', 8, 0
 

@@ -57,9 +57,9 @@ obj.OnTooltipShow = =>
                 right = '%s/%s (%d%%)'\format number.format(.current_xp), number.format(.max_xp), .percentage
                 @AddDoubleLine left, right, 1, 1, 1, 1, 1, 1
     else
-        @AddLine L.b_header_empty
+        @AddLine L.b_header_empty!
     @AddLine ' ' -- Separator
-    @AddDoubleLine L.leftclick, L.b_announce_smart, 0, 1, 0, 0, 1, 0
+    @AddDoubleLine L.leftclick!, L.b_announce_smart!, 0, 1, 0, 0, 1, 0
 
 obj.OnClick = (button) =>
     mod = ((IsControlKeyDown! and 'ctrl') or (IsShiftKeyDown! and 'shift')) or 'none'

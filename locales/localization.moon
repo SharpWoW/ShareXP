@@ -34,10 +34,10 @@ locale_strings = {}
 T.localization = setmetatable {},
     __index: (key) =>
         locale_string = locale_strings[key]
-        locale_string if locale_string else "L.#{key}"
+        locale_string if locale_string else LocaleString "L.#{key}"
 
     __newindex: (key, value) =>
-        rawset locales, key, LocaleString value
+        rawset locale_strings, key, LocaleString value
 
     -- Backwards compatibility
     __call: (key, ...) =>
